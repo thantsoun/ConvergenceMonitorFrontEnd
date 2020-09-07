@@ -1,0 +1,16 @@
+version: '2'
+services:
+  convergence_monitor_front_end-app:
+    image: convergence_monitor_front_end
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,swagger
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://convergence_monitor_front_end-postgresql:5432/convergence_monitor_front_end
+      - JHIPSTER_SLEEP=30 # gives time for other services to boot before the application
+    ports:
+      - 8080:8080
+  convergence_monitor_front_end-postgresql:
+    extends:
+      file: postgresql.yml
+      service: convergence_monitor_front_end-postgresql
