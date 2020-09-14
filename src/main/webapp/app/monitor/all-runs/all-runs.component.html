@@ -1,0 +1,30 @@
+<div class="table-responsive">
+    <h4 id="all-runs-heading">All Runs</h4>
+
+    <div class="table-responsive" *ngIf="allRuns">
+        <span class="badge badge-secondary">Query: </span>{{allRuns.query}}
+    </div>
+    <div class="table-responsive" *ngIf="allRuns">
+        <table class="table table-striped table-sm" aria-describedby="user-management-page-heading">
+            <thead>
+            <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="sortTable.bind(this)">
+                <th scope="col" jhiSortBy="runId"><span>{{allRuns.runIdHeader}}</span><fa-icon icon="sort"></fa-icon></th>
+                <th scope="col" jhiSortBy="description"><span>{{allRuns.descriptionHeader}}</span><fa-icon icon="sort"></fa-icon></th>
+                <th scope="col" jhiSortBy="startTime"><span>{{allRuns.startTimeHeader}}</span><fa-icon icon="sort"></fa-icon></th>
+                <th scope="col" jhiSortBy="endTime"><span>{{allRuns.endTimeHeader}}</span><fa-icon icon="sort"></fa-icon></th>
+                <th scope="col" jhiSortBy="numIterations"><span>{{allRuns.numIterationsHeader}}</span><fa-icon icon="sort"></fa-icon></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let run of allRuns.runs">
+                <td>{{ run.runId }}</td>
+                <td>{{ run.description }}</td>
+                <td>{{ run.startTime }}</td>
+                <td>{{ run.endTime }}</td>
+                <td>{{ run.numIterations }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

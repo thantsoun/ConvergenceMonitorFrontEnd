@@ -1,7 +1,7 @@
 <nav class="navbar navbar-dark navbar-expand-md bg-primary">
     <a class="navbar-brand logo" routerLink="/" (click)="collapseNavbar()">
         <span class="logo-img"></span>
-        <span class="navbar-title">Convergence_monitor_front_end</span> <span class="navbar-version">{{ version }}</span>
+        <span class="navbar-title">AGIS Monitoring Site</span> <span class="navbar-version">{{ version }}</span>
     </a>
     <a class="navbar-toggler d-lg-none" href="javascript:void(0);" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" (click)="toggleNavbar()">
         <fa-icon icon="bars"></fa-icon>
@@ -18,16 +18,40 @@
             </li>
             <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
             <li *ngSwitchCase="true" ngbDropdown class="nav-item dropdown pointer" display="dynamic" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-                <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu">
+                <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="monitor-menu">
                     <span>
                         <fa-icon icon="th-list"></fa-icon>
                         <span>
-                            Entities
+                            Monitor
                         </span>
                     </span>
                 </a>
-                <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
-                    <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
+                <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="monitor-menu">
+                    <li>
+                        <a class="dropdown-item" routerLink="monitor/all-runs" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon icon="running" [fixedWidth]="true"></fa-icon>
+                            <fa-icon icon="running" [fixedWidth]="true"></fa-icon>
+                            <span>All Runs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" routerLink="monitor/current-run" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon icon="running" [fixedWidth]="true"></fa-icon>
+                            <span>Current Run</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" routerLink="monitor/current-plots" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon icon="drafting-compass" [fixedWidth]="true"></fa-icon>
+                            <span>Current Plots</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" routerLink="monitor/properties" routerLinkActive="active" (click)="collapseNavbar()">
+                            <fa-icon icon="percentage" [fixedWidth]="true"></fa-icon>
+                            <span>Properties Run</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li *jhiHasAnyAuthority="'ROLE_ADMIN'" ngbDropdown class="nav-item dropdown pointer" display="dynamic" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
@@ -86,7 +110,6 @@
                             <span>API</span>
                         </a>
                     </li>
-                    <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
                     <li *ngIf="!inProduction">
                         <a class="dropdown-item" href='./h2-console' target="_tab" (click)="collapseNavbar()">
                             <fa-icon icon="hdd" [fixedWidth]="true"></fa-icon>

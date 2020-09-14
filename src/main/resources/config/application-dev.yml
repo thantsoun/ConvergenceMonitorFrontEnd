@@ -15,8 +15,8 @@
 
 logging:
   level:
-    ROOT: DEBUG
-    io.github.jhipster: DEBUG
+    ROOT: INFO
+    io.github.jhipster: INFO
     gaia.cu3.agis.convergence: DEBUG
 
 spring:
@@ -35,23 +35,23 @@ spring:
   jackson:
     serialization:
       indent-output: true
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:h2:mem:convergence_monitor_front_end;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: convergence_monitor_front_end
-    password:
-    hikari:
-      poolName: Hikari
-      auto-commit: false
-  h2:
-    console:
-      enabled: false
-  jpa:
-    database-platform: io.github.jhipster.domain.util.FixedH2Dialect
-    show-sql: true
-  liquibase:
-    # Remove 'faker' if you do not want the sample data to be loaded automatically
-    contexts: dev, faker
+  #  datasource:
+  #    type: com.zaxxer.hikari.HikariDataSource
+  #    url: jdbc:h2:mem:convergence_monitor_front_end;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  #    username: convergence_monitor_front_end
+  #    password:
+  #    hikari:
+  #      poolName: Hikari
+  #      auto-commit: false
+  #  h2:
+  #    console:
+  #      enabled: false
+  #  jpa:
+  #    database-platform: io.github.jhipster.domain.util.FixedH2Dialect
+  #    show-sql: true
+  #  liquibase:
+  # Remove 'faker' if you do not want the sample data to be loaded automatically
+  #    contexts: dev, faker
   mail:
     host: localhost
     port: 25
