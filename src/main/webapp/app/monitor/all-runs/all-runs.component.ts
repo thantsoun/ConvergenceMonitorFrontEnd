@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AllRuns } from './all-runs.model';
 import { SERVER_API_URL } from '../../app.constants';
-import { ActivatedRoute, Router } from '@angular/router';
 import { sort } from 'app/shared/util/sort-util';
+import { showError } from '../../shared/util/funtions.util';
 
 @Component({
   selector: 'jhi-all-runs',
@@ -14,7 +14,7 @@ export class AllRunsComponent implements OnInit {
   predicate = 'runId';
   ascending = true;
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {}
 
   ngOnInit(): void {
     this.httpClient
@@ -23,6 +23,11 @@ export class AllRunsComponent implements OnInit {
       .then(response => {
         this.allRuns = response;
         this.sortTable();
+      })
+      .catch(error => {
+        const title = error.headers.get('convergenceMonitorFrontEndApp-error-title');
+        const msg = error.headers.get('convergenceMonitorFrontEndApp-error-details-001');
+        showError(title, msg);
       });
   }
 

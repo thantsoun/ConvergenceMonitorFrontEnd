@@ -20,10 +20,13 @@
 
 package gaia.cu3.agis.convergence.service;
 
+import gaia.cu1.tools.exception.GaiaException;
 import gaia.cu3.agis.web.PlotBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Properties;
 
 /**
  * $Author$
@@ -41,5 +44,9 @@ public class PlotBeanWrapper {
     public PlotBeanWrapper() {
         log.info("Initializing {}", PlotBeanWrapper.class);
         this.plotBean = new PlotBean();
+    }
+
+    public Properties getPastRunPropsObject() throws GaiaException {
+        return plotBean.getPastRunPropsObject();
     }
 }

@@ -36,6 +36,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.StringWriter;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * $Author$
@@ -74,8 +78,8 @@ public class PlotResource {
             DatabaseStore st = DbUtils.getNamedStore(DbUtils.convStore);
             GaiaTable tb = st.executeQueryGT(allRuns.query, null);
             while (tb.next()) {
-                AllRuns.Run run = new AllRuns.Run(String.valueOf(tb.getLong("RunId")), String.format("%02d", tb.getInt("numIterations")), tb, 
-                        (table, index) -> formatGaiaTableValue(table, index));
+                AllRuns.Run run = new AllRuns.Run(String.valueOf(tb.getLong("RunId")), String.format("%02d", tb.getInt("numIterations")), tb,
+                        this::formatGaiaTableValue);
                 allRuns.addRun(run);
             }
             return ResponseEntity
@@ -85,6 +89,35 @@ public class PlotResource {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting all the runs", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/properties")
+    public ResponseEntity<Map<String, String>> getProperties() {
+        try {
+            Map<String, String> propsMap = new TreeMap<>();
+            Properties props = plotBeanWrapper.getPastRunPropsObject();
+            Set<Map.Entry<Object, Object>> entries = props.entrySet();
+            String cu3AgisPrefix = "gaia.cu3.agis";
+            String cu1ToolsPrefix = "gaia.cu1.tools";
+            String cu1MdbPrefix = "gaia.cu1.mdb.cu1";
+            String javaPrefix = "java";
+            propsMap.put("user.name", System.getProperty("user.name"));
+            for (Map.Entry<Object,Object> entry : entries) {
+                String key = (String) entry.getKey();
+                String value = (String) entry.getValue();
+                if (key.startsWith(cu3AgisPrefix) || key.startsWith(cu1ToolsPrefix) || key.startsWith(cu1MdbPrefix) || key.startsWith(javaPrefix)) {
+                    propsMap.put(key, key.toLowerCase().contains("pass") ? "########" : value);
+                }
+            }
+            return ResponseEntity
+                    .ok(propsMap);
+        } catch (Exception ex) {
+            log.error("Error getting the properties", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the properties", ex.getMessage()))
                     .build();
         }
     }
