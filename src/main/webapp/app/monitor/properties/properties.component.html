@@ -1,19 +1,21 @@
 <div class="table-responsive" >
     <h4 id="properties-heading">Properties</h4>
-    <span>Filter (by prefix)</span> <input type="text" [(ngModel)]="filterText" (ngModelChange)="filter()" class="form-control">
+    <span>Filter (by property name)</span> <input aria-label="filter-text" type="text" [(ngModel)]="filterText" (ngModelChange)="filter()" class="form-control form-control-sm">
 
-    <table class="table table-striped table-bordered table-responsive d-table table-sm" aria-describedby="spring-configuration">
-        <thead>
-        <tr>
-            <th scope="col" class="w-30"><span>Property</span></th>
-            <th scope="col" class="w-70"><span>Value</span></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let prop of props">
-            <td><span>{{ prop.key }}</span></td>
-            <td><span>{{ prop.value }}</span></td>
-        </tr>
-        </tbody>
-    </table>
+    <div style="overflow: auto; max-height: 65vh">
+        <table class="table table-striped table-bordered table-responsive d-table table-sm small-font" aria-describedby="agis-props">
+            <thead>
+            <tr>
+                <th scope="col"><span>Property</span></th>
+                <th scope="col"><span>Value</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let prop of props">
+                <td><span>{{ prop.key }}</span></td>
+                <td><span>{{ prop.value }}</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

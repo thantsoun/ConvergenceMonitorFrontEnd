@@ -1,3 +1,51 @@
 <div class="table-responsive" >
-    <h4 id="current-run-heading">Current Run</h4>
+    <h4 id="current-run-heading">Current Run: {{ summary.iterIdDecoded }}</h4>
+    <div id="summary" [innerHTML]="summary.summaryString"></div>
+    <hr>
+    <h5>Contents of AGIS Job Whiteboard on: {{ wbSummary.timestamp }}</h5>
+    <div class = "col-11" id="pieChart"></div>
+    <hr>
+    <div class = "col-12">
+        <ngb-tabset [destroyOnHide]="false" *ngIf="wbDetails.totalCount > 0">
+            <ngb-tab *ngFor="let statusName of jobTabs" [title]="statusName + ' [' +  wbDetails.jobs[statusName].length + '/' + wbDetails.totalCount + ']'">
+                <ng-template ngbTabContent>
+                    <div style="overflow: auto; max-height: 50vh" class="col-12">
+                        <table class="table table-striped table-bordered table-responsive d-table table-sm small-font"
+                               aria-describedby="agis-props">
+                            <thead>
+                            <tr>
+                                <th scope="col" style="white-space: nowrap;"><span>ID</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>Run ID</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>Priority</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>Type</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>Creation Time</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>Status</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>Start Time</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>End Time</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>Duration</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>Worker</span></th>
+                                <th scope="col" style="white-space: nowrap;"><span>Message</span></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let job of wbDetails.jobs[statusName]">
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.id }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.runId }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.priority }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.type }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.creationTime }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset;" [ngStyle]="{'background-color': job.color}"><span>{{ job.status }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.startTime }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.endTime }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.duration }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.worker }}</span></td>
+                                <td style="white-space: nowrap; word-wrap: unset"><span>{{ job.message }}</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+    </div>
 </div>

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.Writer;
 
 /**
@@ -54,5 +55,17 @@ public class IterationBeanWrapper {
 
     public void format(Writer writer, GaiaTable tb, int column) {
         iterationBean.format(writer, tb, column);
+    }
+
+    public long getIterId() {
+        return iterationBean.getIterId();
+    }
+
+    public String getJobType() {
+        return iterationBean.getJobType();
+    }
+
+    public long getRunId() {
+        return iterationBean.getRunId();
     }
 }
