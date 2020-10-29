@@ -1,0 +1,24 @@
+<ul ngbNav #sourcePlotsBottom="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+    <li *ngFor="let utils of this.nextPlotsUtil" [ngbNavItem]=utils.plotCategory.rawEnum>
+        <a ngbNavLink>{{utils.plotCategory.description}}</a>
+        <ng-template ngbNavContent>
+            <div style="overflow: auto; max-height: 60vh">
+                <table class="table table-striped table-responsive d-table table-sm smallish-font text-nowrap" aria-describedby="Iteration Table">
+                    <thead>
+                    <tr>
+                        <th scope="col"><span>Iteration</span></th>
+                        <th scope="col" *ngFor="let iteration of iterations; index as i"><span>{{iteration.header}}</span></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let plotCat of utils.plotCategory.children; index as i">
+                        <th scope="row"><span>{{plotCat.description}}</span></th>
+                        <td *ngFor="let iteration of iterations; index as i"><span>{{iteration.nr}}</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </ng-template>
+    </li>
+</ul>
+<div [ngbNavOutlet]="sourcePlotsBottom" class="mx-0"></div>

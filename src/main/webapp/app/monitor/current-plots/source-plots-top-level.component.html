@@ -1,0 +1,9 @@
+<ul ngbNav #sourcePlotsTop="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+    <li *ngFor="let util of this.nextPlotsUtil" [ngbNavItem]=util.plotCategory.rawEnum>
+        <a ngbNavLink>{{util.plotCategory.description}}</a>
+        <ng-template ngbNavContent >
+            <jhi-source-plots-bottom-level [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-source-plots-bottom-level>
+        </ng-template>
+    </li>
+</ul>
+<div [ngbNavOutlet]="sourcePlotsTop" class="mx-0"></div>

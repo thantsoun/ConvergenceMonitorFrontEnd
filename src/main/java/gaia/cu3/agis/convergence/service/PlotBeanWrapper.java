@@ -21,6 +21,7 @@
 package gaia.cu3.agis.convergence.service;
 
 import gaia.cu1.tools.exception.GaiaException;
+import gaia.cu3.agis.plotting.PlotCategory;
 import gaia.cu3.agis.web.PlotBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,5 +49,25 @@ public class PlotBeanWrapper {
 
     public Properties getPastRunPropsObject() throws GaiaException {
         return plotBean.getPastRunPropsObject();
+    }
+
+    public int getIterationCount() throws Exception {
+        return plotBean.getIterationCount();
+    }
+
+    public void setRetrievalMode(boolean retrievalMode) {
+        plotBean.setRetrievalMode(retrievalMode);
+    }
+
+    public PlotCategory[] getConvergencePlotCategories() throws GaiaException {
+        return plotBean.getConvergencePlotCategories();
+    }
+    
+    public int getNparamSolved() throws GaiaException {
+        return plotBean.getNparamSolved();
+    }
+
+    public void setRun(long currRunId) throws Exception {
+        plotBean.setRun(currRunId);
     }
 }

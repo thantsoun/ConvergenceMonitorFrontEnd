@@ -19,13 +19,8 @@
  */
 package gaia.cu3.agis.convergence.web.rest;
 
-import gaia.cu3.agis.convergence.domain.CurrentPlotsUtil;
-import gaia.cu3.agis.convergence.service.IterationBeanWrapper;
 import gaia.cu3.agis.convergence.service.PlotBeanWrapper;
 import gaia.cu3.agis.convergence.web.rest.util.DetailedHeaderUtil;
-import gaia.cu3.agis.plotting.PlotCategory;
-import gaia.cu3.agis.util.AgisUtils;
-import gaia.cu3.agis.util.RunIterIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +30,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeMap;
+
 /**
  * $Author$
  * $Date$
@@ -43,39 +43,44 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api")
-public class PlotResource {
+public class PropsResource {
 
-    private final Logger log = LoggerFactory.getLogger(PlotResource.class);
+    private final Logger log = LoggerFactory.getLogger(PropsResource.class);
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
     private final PlotBeanWrapper plotBeanWrapper;
-    private final IterationBeanWrapper iterationBeanWrapper;
 
-    public PlotResource(PlotBeanWrapper plotBeanWrapper, IterationBeanWrapper iterationBeanWrapper) {
-        log.info("Initializing {}", PlotResource.class);
+    public PropsResource(PlotBeanWrapper plotBeanWrapper) {
+        log.info("Initializing {}", PropsResource.class);
         this.plotBeanWrapper = plotBeanWrapper;
-        this.iterationBeanWrapper = iterationBeanWrapper;
     }
     
-    @GetMapping("/currentPlotsUtil")
-    public ResponseEntity<CurrentPlotsUtil> getCurrentPlotsUtil() {
+    @GetMapping("/properties")
+    public ResponseEntity<Map<String, String>> getProperties() {
         try {
-            plotBeanWrapper.setRun(AgisUtils.getCurrRunId());
-            int currentIter = plotBeanWrapper.getIterationCount();
-            plotBeanWrapper.setRetrievalMode(false);
-            PlotCategory[] plotCategories = plotBeanWrapper.getConvergencePlotCategories();
-            int nrParamSolved = plotBeanWrapper.getNparamSolved();
-            String iterIdDecoded = RunIterIdentifier.decodeIterId(iterationBeanWrapper.getIterId());
-            String runIdDecoded = RunIterIdentifier.decodeRunId(iterationBeanWrapper.getRunId());
-            CurrentPlotsUtil currentPlotsUtil = new CurrentPlotsUtil(plotCategories, nrParamSolved, currentIter, runIdDecoded, iterIdDecoded);
-            return ResponseEntity.ok(currentPlotsUtil);
+            Map<String, String> propsMap = new TreeMap<>();
+            Properties props = plotBeanWrapper.getPastRunPropsObject();
+            Set<Map.Entry<Object, Object>> entries = props.entrySet();
+            String cu3AgisPrefix = "gaia.cu3.agis";
+            String cu1ToolsPrefix = "gaia.cu1.tools";
+            String cu1MdbPrefix = "gaia.cu1.mdb.cu1";
+            String javaPrefix = "java";
+            propsMap.put("user.name", System.getProperty("user.name"));
+            for (Map.Entry<Object, Object> entry : entries) {
+                String key = (String) entry.getKey();
+                String value = (String) entry.getValue();
+                if (key.startsWith(cu3AgisPrefix) || key.startsWith(cu1ToolsPrefix) || key.startsWith(cu1MdbPrefix) || key.startsWith(javaPrefix)) {
+                    propsMap.put(key, key.toLowerCase().contains("password") ? "########" : value);
+                }
+            }
+            return ResponseEntity.ok(propsMap);
         } catch (Exception ex) {
-            log.error("Error getting the Current Plots Util Object", ex);
+            log.error("Error getting the properties", ex);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the Current Plots Util Object", ex.getMessage()))
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the properties", ex.getMessage()))
                     .build();
         }
     }

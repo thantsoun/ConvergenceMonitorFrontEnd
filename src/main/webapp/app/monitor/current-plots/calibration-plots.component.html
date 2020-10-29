@@ -1,0 +1,10 @@
+<ul ngbNav #calibrationPlots="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+    <li *ngFor="let util of this.nextPlotsUtil" [ngbNavItem]=util.plotCategory.rawEnum>
+        <a ngbNavLink>{{util.plotCategory.description}}</a>
+        <ng-template ngbNavContent >
+            <p>{{util.plotCategory.code}} [{{startIter}}:{{endIter}}]</p>
+        </ng-template>
+    </li>
+</ul>
+<div [ngbNavOutlet]="calibrationPlots" class="mx-0"></div>
+

@@ -68,4 +68,8 @@ public class IterationBeanWrapper {
     public long getRunId() {
         return iterationBean.getRunId();
     }
+    
+    public long getSolutionId() {
+        return iterationBean.getSolutionId();
+    }
 }

@@ -1,3 +1,22 @@
-<div class="table-responsive" >
-    <h4 id="current-plot-heading">Current Plots</h4>
+<h4 id="current-plot-heading">Plots for current run: {{currentPlotsUtil.runId}}, latest iteration: {{currentPlotsUtil.currentIter}}</h4>
+<div class="form-group">
+    <label class="col-form-label">Iterations&nbsp;</label>
+    <label for="startIter" class="col-form-label">From:&nbsp;</label>
+    <input id="startIter" type="number" min="1" max="{{currentPlotsUtil.currentIter}}" [(ngModel)]="startIterForm">
+    <label for="endIter" class="col-form-label">To:&nbsp;</label>
+    <input id="endIter" type="number" min="1" max="{{currentPlotsUtil.currentIter}}" [(ngModel)]="endIterForm">
+    <button class="btn btn-sm btn-primary" type="submit" (click)="refresh()">Go!</button>
 </div>
+<h6>Summary Plots</h6>
+<h6>Convergence histograms</h6>
+<ul ngbNav #convergenceHistograms="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+    <li *ngFor="let util of nextPlotsUtil" [ngbNavItem]=util.plotCategory.rawEnum>
+        <a ngbNavLink>{{util.plotCategory.description}}</a>
+        <ng-template ngbNavContent>
+            <jhi-source-plots-top-level *ngIf="util.plotCategory.rawEnum === 'SOURCE'" [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-source-plots-top-level>
+            <jhi-calibration-plots *ngIf="util.plotCategory.rawEnum === 'CALIBRATION'" [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-calibration-plots>
+        </ng-template>
+    </li>
+</ul>
+<div [ngbNavOutlet]="convergenceHistograms" class="mx-0"></div>
+
