@@ -102,7 +102,7 @@ public class LoggingAspect {
         try {
             Object result = joinPoint.proceed();
             if (log.isDebugEnabled()) {
-                log.debug("Exit: {}() with result = {}", joinPoint.getSignature().getName(), result);
+                log.debug("Exit: {}()", joinPoint.getSignature().getName());
             }
             return result;
         } catch (IllegalArgumentException e) {

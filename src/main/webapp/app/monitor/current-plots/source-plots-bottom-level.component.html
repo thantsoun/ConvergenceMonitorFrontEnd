@@ -2,18 +2,50 @@
     <li *ngFor="let utils of this.nextPlotsUtil" [ngbNavItem]=utils.plotCategory.rawEnum>
         <a ngbNavLink>{{utils.plotCategory.description}}</a>
         <ng-template ngbNavContent>
-            <div style="overflow: auto; max-height: 60vh">
-                <table class="table table-striped table-responsive d-table table-sm smallish-font text-nowrap" aria-describedby="Iteration Table">
+            <div style="overflow: auto; max-height: 70vh">
+                <table class="table table-responsive d-table table-sm smallish-font" aria-describedby="Iteration Table">
                     <thead>
                     <tr>
-                        <th scope="col"><span>Iteration</span></th>
-                        <th scope="col" *ngFor="let iteration of iterations; index as i"><span>{{iteration.header}}</span></th>
+                        <th scope="col" class="text-center"><span>Iteration</span></th>
+                        <th scope="col" class="text-center" *ngFor="let iteration of iterationHeaders"><span>{{iteration.header}}</span></th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr *ngFor="let plotCat of utils.plotCategory.children; index as i">
-                        <th scope="row"><span>{{plotCat.description}}</span></th>
-                        <td *ngFor="let iteration of iterations; index as i"><span>{{iteration.nr}}</span></td>
+                    <tr *ngFor="let plotCat of utils.plotCategory.children">
+                        <th scope="row" class="text-center align-middle">
+                            <span>{{plotCat.description}}</span>
+                            <span *ngIf="hasPlotMap(plotCat) || hasBinnedHistogram(plotCat)">
+                                <label>
+                                    <br>Extras<input type="checkbox" [(ngModel)]="extrasCheck[plotCat.rawEnum]">
+                                </label>
+                            </span>
+                        </th>
+                        <td *ngFor="let iterationHeader of iterationHeaders">
+                            <div *ngIf="hasPlotReady(plotCat.rawEnum, iterationHeader.nr)">
+                                <img [src]="plotCatToPlot[plotCat.rawEnum][iterationHeader.nr]"
+                                     [width]="plotWidth" alt="Plot for {{plotCat.description}},
+                                      iteration {{iterationHeader.nr}}" 
+                                     style="cursor: pointer"
+                                     (click)="loadPlotBig(utils.plotCategory, plotCat, iterationHeader.nr)">
+                            </div>
+                            <div *ngIf="extrasCheck[plotCat.rawEnum]">
+                                <div *ngIf="!hasPlotReady(plotCat.rawEnum, iterationHeader.nr)">
+                                    <span>Plot for {{plotCat.description}}, iteration {{iterationHeader.nr}}</span>
+                                </div>
+                                <div *ngIf="hasPlotMap(plotCat)">
+                                    <br>
+                                    <span class="fake-href" (click)="loadPlotMap(utils.plotCategory, plotCat, iterationHeader.nr)">Open {{plotCat.description}} map</span>
+                                </div>
+                                <div *ngIf="hasBinnedHistogram(plotCat)">
+                                    <br>
+                                    <span *ngFor="let histInfo of binHistogramInfoFor(plotCat.rawEnum, iterationHeader.nr); index as histInfoIndex" 
+                                          class="fake-href" (click)="loadMagBinnedHistogram(plotCat, iterationHeader.nr, histInfoIndex, histInfo.info)">
+                                        {{histInfo.info}}<span *ngIf="histInfo.isEmpty"> [Empty]</span>
+                                        <br>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

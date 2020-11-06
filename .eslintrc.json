@@ -18,7 +18,9 @@
       {
         "vars": "all",
         "args": "after-used",
-        "ignoreRestSiblings": false
+        "ignoreRestSiblings": false,
+        "varsIgnorePattern": "ignore",
+        "argsIgnorePattern": "ignore"
       }
     ],
     "@typescript-eslint/no-non-null-assertion": "off"

@@ -27,7 +27,7 @@ public class CurrentPlotsUtil {
         List<PlotCategory> plotCategoryList = new ArrayList<>(Arrays.asList(plotCategoriesArray));
         plotCategoryList.remove(PlotCategory.CONVSUMMARY);
         final List<ProcessItem> toProcess = plotCategoryList.stream()
-                .map(plotCategory -> new ProcessItem(this.plotCategory, plotCategory))
+                .map(plotCategoryTmp -> new ProcessItem(this.plotCategory, plotCategoryTmp))
                 .collect(Collectors.toList());
         final EnumSet<PlotCategory> processed = EnumSet.noneOf(PlotCategory.class);
         while (!toProcess.isEmpty()) {
@@ -62,11 +62,16 @@ public class CurrentPlotsUtil {
         public final String code;
         public final String description;
         public final String rawEnum;
+        public final List<String> parents = new ArrayList<>();
         
         public Node(PlotCategory plotCategory) {
             this.rawEnum = plotCategory.toString();
             this.code = plotCategory.getCode();
             this.description = plotCategory.getDescription();
+            while (Objects.nonNull(plotCategory.getParent())) {
+                plotCategory = plotCategory.getParent();
+                parents.add(0, plotCategory.name());
+            }
         }
 
         public Node() {

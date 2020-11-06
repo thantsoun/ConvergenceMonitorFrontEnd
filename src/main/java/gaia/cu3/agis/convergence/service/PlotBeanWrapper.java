@@ -21,13 +21,18 @@
 package gaia.cu3.agis.convergence.service;
 
 import gaia.cu1.tools.exception.GaiaException;
+import gaia.cu3.agis.algo.gis.convergence.source.MagnitudeBinHistoImpl;
+import gaia.cu3.agis.convergence.domain.BinHistogramInfo;
 import gaia.cu3.agis.plotting.PlotCategory;
 import gaia.cu3.agis.web.PlotBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * $Author$
@@ -69,5 +74,72 @@ public class PlotBeanWrapper {
 
     public void setRun(long currRunId) throws Exception {
         plotBean.setRun(currRunId);
+    }
+    
+    public List<BinHistogramInfo> getMagnitudeBinnedHisto(short iter, int parentOrdinal, boolean isUpdate) throws Exception {
+        List<MagnitudeBinHistoImpl> binHistogramList = plotBean.getMagnitudeBinnedHisto(iter, parentOrdinal, isUpdate);
+        return binHistogramList.stream()
+                .map(histogram -> BinHistogramInfo.getBinHistogramInfo(histogram, isUpdate))
+                .collect(Collectors.toList());
+    }
+
+    public byte[] plot(PlotCategory plotCategory, short iteration, int width, boolean cached, short export) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024*1024);
+
+        plotBean.setWithtitle(true);
+        plotBean.setSet((short)plotCategory.ordinal());
+        plotBean.setCached(cached);
+        plotBean.setWidth(width);
+        plotBean.setIter(iteration);
+        plotBean.setExport(export);
+        
+        if(!plotCategory.getCode().contains("correlation")) {
+            plotBean.plot(outputStream, iteration, (short) plotCategory.ordinal());
+        } else {
+            plotBean.plotCorrelation(outputStream, iteration, (short) plotCategory.ordinal());
+        }
+        
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    public byte[] plotMap(PlotCategory plotCategory, short iteration, int width, boolean cached, short export, double min, double max) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024*1024);
+
+        boolean colorFilter1 = min != 0d;
+        boolean colorFilter2 = max != 0d;
+
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        plotBean.setColorFilter(colorFilter1 && colorFilter2);
+        plotBean.setMinRangeMap(min);
+        plotBean.setMaxRangeMap(max);
+        plotBean.setCat(plotCategory.getParent().getCode());
+        plotBean.setExport(export);
+
+        try {
+            plotBean.plotHpixMap(outputStream, iteration, (short) plotCategory.ordinal());
+        } catch (Exception e) {
+            log.error("Error getting the Hpix Plot Map", e);
+            plotBean.streamErrorImage(outputStream, e.getMessage());
+        }
+
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    public byte[] magBinnedHistogram(PlotCategory plotCategory, short iteration, int width, boolean cached, short bin, boolean isUpdate) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024*1024);
+
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        plotBean.setCat(plotCategory.getParent().getCode());
+
+        plotBean.plotMagBinned(outputStream, iteration, (short) plotCategory.ordinal(), bin, isUpdate);
+        
+        outputStream.flush();
+        return outputStream.toByteArray();
     }
 }

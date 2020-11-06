@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CurrentPlotsUtil, generateNextLevelPlotsUtil, PlotsTreeNode } from './current-plots-util.model';
+import { CurrentPlotsUtil, PlotsTreeNode } from './current-plots-util.model';
 import { SERVER_API_URL } from '../../app.constants';
 import { showError } from '../../shared/util/funtions.util';
+import { generateNextLevelPlotsUtil, handleHttpRequestError } from './function-utils';
 
 @Component({
   selector: 'jhi-current-plots',
   templateUrl: './current-plots.component.html',
 })
 export class CurrentPlotsComponent implements OnInit {
-  private emptyTreeNode = new PlotsTreeNode('', '', '', []);
+  private emptyTreeNode = new PlotsTreeNode('', '', '', [], []);
   currentPlotsUtil = new CurrentPlotsUtil(0, 0, '', '', this.emptyTreeNode);
   nextPlotsUtil: CurrentPlotsUtil[] = [];
   startIter = 0;
@@ -26,7 +27,7 @@ export class CurrentPlotsComponent implements OnInit {
       .get<CurrentPlotsUtil>(SERVER_API_URL + 'api/currentPlotsUtil')
       .toPromise()
       .then(this.handleSuccess)
-      .catch(this.handleError);
+      .catch(handleHttpRequestError);
   }
 
   refresh(): void {
@@ -57,11 +58,5 @@ export class CurrentPlotsComponent implements OnInit {
     }
     this.endIterForm = this.endIter;
     this.startIterForm = this.startIter;
-  };
-
-  private handleError = (error: { headers: { get: (arg0: string) => any } }) => {
-    const title = error.headers.get('convergenceMonitorFrontEndApp-error-title');
-    const msg = error.headers.get('convergenceMonitorFrontEndApp-error-details-001');
-    showError(title, msg);
   };
 }

@@ -1,5 +1,11 @@
 export class PlotsTreeNode {
-  constructor(public code: string, public description: string, public rawEnum: string, public children: PlotsTreeNode[]) {}
+  constructor(
+    public code: string,
+    public description: string,
+    public rawEnum: string,
+    public children: PlotsTreeNode[],
+    public parents: String[]
+  ) {}
 }
 
 export class CurrentPlotsUtil {
@@ -12,19 +18,30 @@ export class CurrentPlotsUtil {
   ) {}
 }
 
-export function createPlotsUtilFromNode(plotsTreeNode: PlotsTreeNode, plotsUtil: CurrentPlotsUtil): CurrentPlotsUtil {
-  return new CurrentPlotsUtil(plotsUtil.nrParamSolved, plotsUtil.currentIter, plotsUtil.runId, plotsUtil.iterId, plotsTreeNode);
+export class BinHistogramInfo {
+  constructor(public info: string, public isEmpty: boolean, public isUpdate: boolean) {}
 }
 
-export function generateNextLevelPlotsUtil(currentLevelPlotsUtil: CurrentPlotsUtil): [CurrentPlotsUtil, CurrentPlotsUtil[], string] {
-  let activeTab = '';
-  const bottomLevelPlotsUtil: CurrentPlotsUtil[] = [];
-  const createBottomLevelPlotsUtil = (plotsTreeNode: PlotsTreeNode) => {
-    bottomLevelPlotsUtil.push(createPlotsUtilFromNode(plotsTreeNode, currentLevelPlotsUtil));
-  };
-  if (currentLevelPlotsUtil.plotCategory.children.length > 0) {
-    currentLevelPlotsUtil.plotCategory.children.forEach(createBottomLevelPlotsUtil);
-    activeTab = currentLevelPlotsUtil.plotCategory.children[0].rawEnum;
-  }
-  return [currentLevelPlotsUtil, bottomLevelPlotsUtil, activeTab];
+export interface IterationToBinHistInfo {
+  [iteration: number]: BinHistogramInfo[];
+}
+
+export interface PlotCatToBinHistInfo {
+  [rawEnum: string]: IterationToBinHistInfo;
+}
+
+export interface IterationToPlot {
+  [iteration: number]: any;
+}
+
+export interface PlotCatToPlot {
+  [rawEnum: string]: IterationToPlot;
+}
+
+export class IterationHeader {
+  constructor(public header: string, public nr: number) {}
+}
+
+export function createPlotsUtilFromNode(plotsTreeNode: PlotsTreeNode, plotsUtil: CurrentPlotsUtil): CurrentPlotsUtil {
+  return new CurrentPlotsUtil(plotsUtil.nrParamSolved, plotsUtil.currentIter, plotsUtil.runId, plotsUtil.iterId, plotsTreeNode);
 }

@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CurrentPlotsUtil, generateNextLevelPlotsUtil } from './current-plots-util.model';
+import { CurrentPlotsUtil } from './current-plots-util.model';
+import { generateNextLevelPlotsUtil } from './function-utils';
 
 @Component({
   selector: 'jhi-source-plots-top-level',
