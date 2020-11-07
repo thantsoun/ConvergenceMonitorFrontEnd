@@ -11,7 +11,7 @@ import { generateNextLevelPlotsUtil, handleHttpRequestError } from './function-u
 })
 export class CurrentPlotsComponent implements OnInit {
   private emptyTreeNode = new PlotsTreeNode('', '', '', [], []);
-  currentPlotsUtil = new CurrentPlotsUtil(0, 0, '', '', this.emptyTreeNode);
+  currentPlotsUtil = new CurrentPlotsUtil(0, 0, '', '', 0, this.emptyTreeNode);
   nextPlotsUtil: CurrentPlotsUtil[] = [];
   startIter = 0;
   endIter = 1;

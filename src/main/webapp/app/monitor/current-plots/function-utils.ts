@@ -1,4 +1,11 @@
-import { BinHistogramInfo, createPlotsUtilFromNode, CurrentPlotsUtil, IterationHeader, PlotsTreeNode } from './current-plots-util.model';
+import {
+  BinHistogramInfo,
+  createPlotsUtilFromNode,
+  CurrentPlotsUtil,
+  IterationHeader,
+  PlotCatToPlot,
+  PlotsTreeNode,
+} from './current-plots-util.model';
 import { showError } from '../../shared/util/funtions.util';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { createRequestOption } from '../../shared/util/request-util';
@@ -46,7 +53,7 @@ export function createIterationHeaders(startIter: number, endIter: number, runId
     };
   }
   while (!finished(currentIteration, endIter)) {
-    let headerString = currentIteration + ': ' + runId + '.' + currentIteration;
+    let headerString = 'Iter. ' + currentIteration + ' of Run ' + runId;
     if (currentIteration !== latestIteration) {
       headerString += ' - DONE';
     } else {
@@ -98,6 +105,45 @@ export function getBinHistogramInfo(
     .toPromise()
     .then(response => successFunction(response.body))
     .catch(handleHttpRequestError);
+}
+
+export function getHandleImageInNewTabSuccess(title: string): (imageBlob: any) => void {
+  return imageBlob => {
+    const reader = new FileReader();
+    reader.addEventListener(
+      'load',
+      () => {
+        getOpenImgInNewTabCallback(title)(reader.result);
+      },
+      false
+    );
+    if (imageBlob) {
+      reader.readAsDataURL(imageBlob);
+    }
+  };
+}
+
+export function getHandlePlotSuccess(
+  plotCategory: PlotsTreeNode,
+  iteration: number,
+  plotCatToPlot: PlotCatToPlot
+): (imageBlob: any) => void {
+  return imageBlob => {
+    if (!(plotCategory.rawEnum in plotCatToPlot)) {
+      plotCatToPlot[plotCategory.rawEnum] = {};
+    }
+    const reader = new FileReader();
+    reader.addEventListener(
+      'load',
+      () => {
+        plotCatToPlot[plotCategory.rawEnum][iteration] = reader.result;
+      },
+      false
+    );
+    if (imageBlob) {
+      reader.readAsDataURL(imageBlob);
+    }
+  };
 }
 
 export function getPlot(

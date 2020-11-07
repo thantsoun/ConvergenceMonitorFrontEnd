@@ -12,8 +12,9 @@ import {
   createIterationHeaders,
   generateNextLevelPlotsUtilWithFilter,
   getBinHistogramInfo,
+  getHandleImageInNewTabSuccess,
+  getHandlePlotSuccess,
   getMagBinnedHistogram,
-  getOpenImgInNewTabCallback,
   getPlot,
   getPlotMap,
   isDerivedFrom,
@@ -85,9 +86,16 @@ export class SourcePlotsBottomLevelComponent implements OnInit {
     this.extrasCheck = {};
     for (const parent of this.nextPlotsUtil) {
       for (const child of parent.plotCategory.children) {
-        this.extrasCheck[child.rawEnum] = true;
+        this.extrasCheck[child.rawEnum] = false;
         for (const iteration of this.iterationHeaders) {
-          getPlot(this.httpClient, child, iteration.nr, this.plotWidth, true, this.getHandlePlotSuccess(child, iteration.nr));
+          getPlot(
+            this.httpClient,
+            child,
+            iteration.nr,
+            this.plotWidth,
+            true,
+            getHandlePlotSuccess(child, iteration.nr, this.plotCatToPlot)
+          );
           if (this.hasBinnedHistogram(child)) {
             getBinHistogramInfo(this.httpClient, child, iteration.nr, this.getHandleBinHistSuccess(child, iteration.nr));
           }
@@ -145,41 +153,6 @@ export class SourcePlotsBottomLevelComponent implements OnInit {
     };
   }
 
-  private getHandlePlotSuccess(plotCategory: PlotsTreeNode, iteration: number): (imageBlob: any) => void {
-    return imageBlob => {
-      if (!(plotCategory.rawEnum in this.plotCatToPlot)) {
-        this.plotCatToPlot[plotCategory.rawEnum] = {};
-      }
-      const reader = new FileReader();
-      reader.addEventListener(
-        'load',
-        () => {
-          this.plotCatToPlot[plotCategory.rawEnum][iteration] = reader.result;
-        },
-        false
-      );
-      if (imageBlob) {
-        reader.readAsDataURL(imageBlob);
-      }
-    };
-  }
-
-  private getHandleImageInNewTabSuccess(title: string): (imageBlob: any) => void {
-    return imageBlob => {
-      const reader = new FileReader();
-      reader.addEventListener(
-        'load',
-        () => {
-          getOpenImgInNewTabCallback(title)(reader.result);
-        },
-        false
-      );
-      if (imageBlob) {
-        reader.readAsDataURL(imageBlob);
-      }
-    };
-  }
-
   binHistogramInfoFor(rawEnum: string, iteration: number): BinHistogramInfo[] {
     if (this.hasBinnedHistogramReady(rawEnum, iteration)) {
       return this.plotCatToBinHistInfo[rawEnum][iteration];
@@ -190,24 +163,16 @@ export class SourcePlotsBottomLevelComponent implements OnInit {
 
   loadPlotBig(plotCategoryParert: PlotsTreeNode, plotCategory: PlotsTreeNode, iteration: number): void {
     const title = plotCategoryParert.description + '[' + plotCategory.description + '] Plot';
-    getPlot(this.httpClient, plotCategory, iteration, this.plotWidthExtra, false, this.getHandleImageInNewTabSuccess(title));
+    getPlot(this.httpClient, plotCategory, iteration, this.plotWidthExtra, false, getHandleImageInNewTabSuccess(title));
   }
 
   loadPlotMap(plotCategoryParert: PlotsTreeNode, plotCategory: PlotsTreeNode, iteration: number): void {
     const title = plotCategoryParert.description + '[' + plotCategory.description + '] Map';
-    getPlotMap(this.httpClient, plotCategory, iteration, this.plotWidthExtra, false, this.getHandleImageInNewTabSuccess(title));
+    getPlotMap(this.httpClient, plotCategory, iteration, this.plotWidthExtra, false, getHandleImageInNewTabSuccess(title));
   }
 
   loadMagBinnedHistogram(plotCategory: PlotsTreeNode, iteration: number, bin: number, binInfo: string): void {
     const title = binInfo + ' Histogram';
-    getMagBinnedHistogram(
-      this.httpClient,
-      plotCategory,
-      iteration,
-      this.plotWidthExtra,
-      false,
-      bin,
-      this.getHandleImageInNewTabSuccess(title)
-    );
+    getMagBinnedHistogram(this.httpClient, plotCategory, iteration, this.plotWidthExtra, false, bin, getHandleImageInNewTabSuccess(title));
   }
 }

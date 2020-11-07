@@ -1,0 +1,34 @@
+<ul ngbNav #globalPlotsBottom="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+    <li *ngFor="let gguGroupName of gguGroupNames; let gguGroupNameIndex = index" [ngbNavItem]=gguGroupName>
+        <a ngbNavLink>{{gguGroupName}}</a>
+        <ng-template ngbNavContent>
+            <div style="overflow: auto; max-height: 70vh">
+                <table class="table table-responsive d-table table-sm smallish-font" aria-describedby="Iteration Table">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="text-center"><span>Iteration</span></th>
+                        <th scope="col" class="text-center" *ngFor="let iteration of iterationHeaders"><span>{{iteration.header}}</span></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let plotCategory of currentPlotsUtil.plotCategory.children; let plotCategoryIndex = index">
+                        <th scope="row" class="text-center align-middle">
+                            <span>{{plotCategory.description}}</span>
+                        </th>
+                        <td *ngFor="let iterationHeader of iterationHeaders">
+                            <div *ngIf="hasPlotReady(gguGroupNameIndex, plotCategoryIndex, iterationHeader.nr)" class="text-center">
+                                <img [src]="plotIndexesToPlot[gguGroupNameIndex][plotCategoryIndex].get(iterationHeader.nr)"
+                                     [width]="plotWidth" alt="Plot for {{gguGroupName}} [{{plotCategory.description}}],
+                                      iteration {{iterationHeader.nr}}"
+                                     style="cursor: pointer"
+                                     (click)="loadPlotBig(gguGroupNameIndex, plotCategoryIndex, iterationHeader.nr)">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </ng-template>
+    </li>
+</ul>
+<div [ngbNavOutlet]="globalPlotsBottom" class="mx-0"></div>

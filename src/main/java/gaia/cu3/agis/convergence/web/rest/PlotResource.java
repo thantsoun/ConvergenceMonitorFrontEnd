@@ -73,9 +73,10 @@ public class PlotResource {
             plotBeanWrapper.setRetrievalMode(false);
             PlotCategory[] plotCategories = plotBeanWrapper.getConvergencePlotCategories();
             int nrParamSolved = plotBeanWrapper.getNparamSolved();
-            String iterIdDecoded = RunIterIdentifier.decodeIterId(iterationBeanWrapper.getIterId());
+            long iterId = iterationBeanWrapper.getIterId();
+            String iterIdDecoded = RunIterIdentifier.decodeIterId(iterId);
             String runIdDecoded = RunIterIdentifier.decodeRunId(iterationBeanWrapper.getRunId());
-            CurrentPlotsUtil currentPlotsUtil = new CurrentPlotsUtil(plotCategories, nrParamSolved, currentIter, runIdDecoded, iterIdDecoded);
+            CurrentPlotsUtil currentPlotsUtil = new CurrentPlotsUtil(plotCategories, nrParamSolved, currentIter, runIdDecoded, iterIdDecoded, iterId);
             return ResponseEntity.ok(currentPlotsUtil);
         } catch (Exception ex) {
             log.error("Error getting the Current Plots Util Object", ex);
@@ -180,6 +181,43 @@ public class PlotResource {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the mag binned histogram", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/getGlobalGroupNames")
+    public ResponseEntity<List<String>> getGlobalGroupNames() {
+        try {
+            return ResponseEntity.ok()
+                    .body(plotBeanWrapper.getGlobalGroupNames());
+        } catch (Exception ex) {
+            log.error("Error getting the global group names", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the global group names", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotMultiGlobals")
+    public ResponseEntity<InputStreamResource> plotMultiGlobals(
+            @RequestParam(value = "globalGroupIndex") short globalGroupIndex,
+            @RequestParam(value = "set") short set,
+            @RequestParam(value = "iteration") short iteration,
+            @RequestParam(value = "width") int width
+    ) {
+        try {
+            byte[] imgBytes = plotBeanWrapper.plotMultiGlobals(globalGroupIndex, set, iteration, width);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(imgBytes));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the multi globals", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the multi globals", ex.getMessage()))
                     .build();
         }
     }

@@ -13,7 +13,8 @@ export class CurrentPlotsUtil {
     public nrParamSolved: number,
     public currentIter: number,
     public runId: string,
-    public iterId: string,
+    public iterIdDecoded: string,
+    public iterId: number,
     public plotCategory: PlotsTreeNode
   ) {}
 }
@@ -43,5 +44,12 @@ export class IterationHeader {
 }
 
 export function createPlotsUtilFromNode(plotsTreeNode: PlotsTreeNode, plotsUtil: CurrentPlotsUtil): CurrentPlotsUtil {
-  return new CurrentPlotsUtil(plotsUtil.nrParamSolved, plotsUtil.currentIter, plotsUtil.runId, plotsUtil.iterId, plotsTreeNode);
+  return new CurrentPlotsUtil(
+    plotsUtil.nrParamSolved,
+    plotsUtil.currentIter,
+    plotsUtil.runId,
+    plotsUtil.iterIdDecoded,
+    plotsUtil.iterId,
+    plotsTreeNode
+  );
 }

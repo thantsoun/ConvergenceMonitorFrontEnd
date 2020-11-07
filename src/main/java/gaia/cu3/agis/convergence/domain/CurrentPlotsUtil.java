@@ -17,13 +17,15 @@ public class CurrentPlotsUtil {
     public final int nrParamSolved;
     public final int currentIter;
     public final String runId;
-    public final String iterId;
+    public final String iterIdDecoded;
+    public final long iterId;
     public final Node plotCategory = new Node();
 
-    public CurrentPlotsUtil(PlotCategory[] plotCategoriesArray, int nrParamSolved, int currentIter, String runId, String iterId) {
+    public CurrentPlotsUtil(PlotCategory[] plotCategoriesArray, int nrParamSolved, int currentIter, String runId, String iterIdDecoded, long iterId) {
         this.nrParamSolved = nrParamSolved;
         this.runId = runId;
         this.iterId = iterId;
+        this.iterIdDecoded = iterIdDecoded;
         List<PlotCategory> plotCategoryList = new ArrayList<>(Arrays.asList(plotCategoriesArray));
         plotCategoryList.remove(PlotCategory.CONVSUMMARY);
         final List<ProcessItem> toProcess = plotCategoryList.stream()

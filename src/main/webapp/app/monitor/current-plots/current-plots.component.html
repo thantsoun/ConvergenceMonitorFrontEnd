@@ -1,4 +1,4 @@
-<h4 id="current-plot-heading">Plots for current run: {{currentPlotsUtil.runId}}, latest iteration: {{currentPlotsUtil.currentIter}}</h4>
+<h4 id="current-plot-heading">Plots for current run: {{currentPlotsUtil.runId}}, latest iteration: {{currentPlotsUtil.currentIter}}, id: {{currentPlotsUtil.iterId}}</h4>
 <div class="form-group">
     <label class="col-form-label">Iterations&nbsp;</label>
     <label for="startIter" class="col-form-label">From:&nbsp;</label>
@@ -14,7 +14,9 @@
         <a ngbNavLink>{{util.plotCategory.description}}</a>
         <ng-template ngbNavContent>
             <jhi-source-plots-top-level *ngIf="util.plotCategory.rawEnum === 'SOURCE'" [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-source-plots-top-level>
+            <jhi-attitude-plots *ngIf="util.plotCategory.rawEnum === 'ATTITUDE'" [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-attitude-plots>
             <jhi-calibration-plots *ngIf="util.plotCategory.rawEnum === 'CALIBRATION'" [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-calibration-plots>
+            <jhi-global-plots *ngIf="util.plotCategory.rawEnum === 'GLOBAL'" [plotsUtil]="util"></jhi-global-plots>
         </ng-template>
     </li>
 </ul>

@@ -1,0 +1,34 @@
+<ul ngbNav #attitudePlotsBottom="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+    <li *ngFor="let utils of this.nextPlotsUtil" [ngbNavItem]=utils.plotCategory.rawEnum>
+        <a ngbNavLink>{{utils.plotCategory.description}}</a>
+        <ng-template ngbNavContent>
+            <div style="overflow: auto; max-height: 70vh">
+                <table class="table table-responsive d-table table-sm smallish-font" aria-describedby="Iteration Table">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="text-center"><span>Iteration</span></th>
+                        <th scope="col" class="text-center" *ngFor="let iteration of iterationHeaders"><span>{{iteration.header}}</span></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let plotCat of filterNonHistorical(utils.plotCategory.children)">
+                        <th scope="row" class="text-center align-middle">
+                            <span>{{plotCat.description}}</span>
+                        </th>
+                        <td *ngFor="let iterationHeader of iterationHeaders">
+                            <div *ngIf="hasPlotReady(plotCat.rawEnum, iterationHeader.nr)" class="text-center">
+                                <img [src]="plotCatToPlot[plotCat.rawEnum][iterationHeader.nr]"
+                                     [width]="plotWidth" alt="Plot for {{plotCat.description}},
+                                      iteration {{iterationHeader.nr}}"
+                                     style="cursor: pointer"
+                                     (click)="loadPlotBig(utils.plotCategory, plotCat, iterationHeader.nr)">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </ng-template>
+    </li>
+</ul>
+<div [ngbNavOutlet]="attitudePlotsBottom" class="mx-0"></div>

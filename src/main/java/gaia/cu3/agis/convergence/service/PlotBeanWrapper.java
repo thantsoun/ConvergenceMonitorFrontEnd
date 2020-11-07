@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -141,5 +142,22 @@ public class PlotBeanWrapper {
         
         outputStream.flush();
         return outputStream.toByteArray();
+    }
+
+    public List<String> getGlobalGroupNames() throws Exception {
+        return Arrays.asList(plotBean.getGlobalGroupNames());
+    }
+
+    public byte[] plotMultiGlobals(short globalGroupIndex, short set, short iteration, int width) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024*1024);
+
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        
+        plotBean.plotMultiGlobals(outputStream, globalGroupIndex, iteration, set);
+
+        outputStream.flush();
+        return outputStream.toByteArray();
+        
     }
 }
