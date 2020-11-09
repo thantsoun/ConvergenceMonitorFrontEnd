@@ -6,8 +6,14 @@
     <label for="endIter" class="col-form-label">To:&nbsp;</label>
     <input id="endIter" type="number" min="1" max="{{currentPlotsUtil.currentIter}}" [(ngModel)]="endIterForm">
     <button class="btn btn-sm btn-primary" type="submit" (click)="refresh()">Go!</button>
+    <button class="btn btn-sm btn-primary float-right" (click)="getImagesZipped()">
+        <fa-icon icon="download"></fa-icon><span>Get cached plots</span>
+    </button>
 </div>
-<h6>Summary Plots</h6>
+<h6><span>Summary Plots </span>
+    <span style="cursor: pointer" *ngIf="!summaryShown" (click)="summaryShown = !summaryShown">[Show]</span>
+    <span style="cursor: pointer" *ngIf="summaryShown" (click)="summaryShown = !summaryShown">[Hide]</span>
+</h6>
 <h6>Convergence histograms</h6>
 <ul ngbNav #convergenceHistograms="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
     <li *ngFor="let util of nextPlotsUtil" [ngbNavItem]=util.plotCategory.rawEnum>

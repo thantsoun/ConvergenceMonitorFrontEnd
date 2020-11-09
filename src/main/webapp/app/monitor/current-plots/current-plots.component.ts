@@ -4,6 +4,7 @@ import { CurrentPlotsUtil, PlotsTreeNode } from './current-plots-util.model';
 import { SERVER_API_URL } from '../../app.constants';
 import { showError } from '../../shared/util/funtions.util';
 import { generateNextLevelPlotsUtil, handleHttpRequestError } from './function-utils';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'jhi-current-plots',
@@ -19,6 +20,7 @@ export class CurrentPlotsComponent implements OnInit {
   endIterForm = 0;
   activeTab = '';
   defaultIterSpread = 5;
+  summaryShown = false;
 
   constructor(private httpClient: HttpClient) {}
 
@@ -59,4 +61,28 @@ export class CurrentPlotsComponent implements OnInit {
     this.endIterForm = this.endIter;
     this.startIterForm = this.startIter;
   };
+
+  getImagesZipped(): void {
+    this.httpClient
+      .get(SERVER_API_URL + 'api/getImagesZipped', {
+        observe: 'response',
+        responseType: 'blob',
+      })
+      .toPromise()
+      .then(response => {
+        this.downLoadFile(response);
+      })
+      .catch(handleHttpRequestError);
+  }
+
+  downLoadFile(response: any): void {
+    const filenameIndex = 'filename=';
+    const contentDisposition = response.headers.get('Content-Disposition');
+    const filename = contentDisposition.substring(contentDisposition.indexOf(filenameIndex) + filenameIndex.length);
+    const contentType = response.headers.get('content-type');
+    const attachment = new Blob([response.body], {
+      type: contentType,
+    });
+    saveAs(attachment, filename);
+  }
 }

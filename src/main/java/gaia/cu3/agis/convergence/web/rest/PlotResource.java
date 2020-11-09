@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -213,6 +214,25 @@ public class PlotResource {
                     .header("Content-Type", "image/png")
                     .header("Cache-Control", "no-cache")
                     .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the multi globals", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the multi globals", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/getImagesZipped")
+    public ResponseEntity<byte[]> getImagesZipped() {
+        try {
+            byte[] imgBytes = plotBeanWrapper.imagesToZip();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(imgBytes.length);
+            String filename = "AGIS_plots_" + iterationBeanWrapper.getIterId() + ".zip";
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
+            return ResponseEntity.ok().headers(headers).body(imgBytes);
         } catch (Exception ex) {
             log.error("Error getting the multi globals", ex);
             return ResponseEntity

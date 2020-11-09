@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -159,5 +160,12 @@ public class PlotBeanWrapper {
         outputStream.flush();
         return outputStream.toByteArray();
         
+    }
+    
+    public byte[] imagesToZip() throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.imagesToZip(outputStream);
+        outputStream.flush();
+        return outputStream.toByteArray();
     }
 }

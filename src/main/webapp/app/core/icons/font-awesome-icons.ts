@@ -37,6 +37,7 @@ import {
   faRunning,
   faPercentage,
   faDraftingCompass,
+  faDownload,
 } from '@fortawesome/free-solid-svg-icons';
 
 export const fontAwesomeIcons = [
@@ -78,4 +79,5 @@ export const fontAwesomeIcons = [
   faRunning,
   faPercentage,
   faDraftingCompass,
+  faDownload,
 ];
