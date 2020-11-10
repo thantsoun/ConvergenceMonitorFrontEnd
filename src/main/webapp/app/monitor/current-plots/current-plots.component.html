@@ -14,17 +14,20 @@
     <span style="cursor: pointer" *ngIf="!summaryShown" (click)="summaryShown = !summaryShown">[Show]</span>
     <span style="cursor: pointer" *ngIf="summaryShown" (click)="summaryShown = !summaryShown">[Hide]</span>
 </h6>
-<h6>Convergence histograms</h6>
-<ul ngbNav #convergenceHistograms="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+<h6>Convergence histograms
+    <span style="cursor: pointer" *ngIf="!convergenceShown" (click)="convergenceShown = !convergenceShown">[Show]</span>
+    <span style="cursor: pointer" *ngIf="convergenceShown" (click)="convergenceShown = !convergenceShown">[Hide]</span>
+</h6>
+<ul [hidden]="!convergenceShown" ngbNav #convergenceHistograms="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
     <li *ngFor="let util of nextPlotsUtil" [ngbNavItem]=util.plotCategory.rawEnum>
         <a ngbNavLink>{{util.plotCategory.description}}</a>
         <ng-template ngbNavContent>
             <jhi-source-plots-top-level *ngIf="util.plotCategory.rawEnum === 'SOURCE'" [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-source-plots-top-level>
             <jhi-attitude-plots *ngIf="util.plotCategory.rawEnum === 'ATTITUDE'" [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-attitude-plots>
-            <jhi-calibration-plots *ngIf="util.plotCategory.rawEnum === 'CALIBRATION'" [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-calibration-plots>
+            <jhi-calibration-plots-top-level *ngIf="util.plotCategory.rawEnum === 'CALIBRATION'" [plotsUtil]="util" [startIteration]="startIter" [endIteration]="endIter"></jhi-calibration-plots-top-level>
             <jhi-global-plots *ngIf="util.plotCategory.rawEnum === 'GLOBAL'" [plotsUtil]="util"></jhi-global-plots>
         </ng-template>
     </li>
 </ul>
-<div [ngbNavOutlet]="convergenceHistograms" class="mx-0"></div>
+<div [hidden]="!convergenceShown" [ngbNavOutlet]="convergenceHistograms" class="mx-0"></div>
 

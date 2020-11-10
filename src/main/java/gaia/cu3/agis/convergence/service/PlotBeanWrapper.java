@@ -21,8 +21,13 @@
 package gaia.cu3.agis.convergence.service;
 
 import gaia.cu1.tools.exception.GaiaException;
+import gaia.cu1.tools.satellite.calibration.astro.AstroCalDataServer;
+import gaia.cu1.tools.satellite.definitions.FprsDirection;
 import gaia.cu3.agis.algo.gis.convergence.source.MagnitudeBinHistoImpl;
 import gaia.cu3.agis.convergence.domain.BinHistogramInfo;
+import gaia.cu3.agis.convergence.domain.CalibrationEffectInfo;
+import gaia.cu3.agis.convergence.domain.NrEffectsUsed;
+import gaia.cu3.agis.convergence.domain.PlotSummaryInfo;
 import gaia.cu3.agis.plotting.PlotCategory;
 import gaia.cu3.agis.web.PlotBean;
 import org.slf4j.Logger;
@@ -31,6 +36,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -49,7 +55,7 @@ public class PlotBeanWrapper {
     
     private final PlotBean plotBean;
 
-    public PlotBeanWrapper() {
+    public PlotBeanWrapper() throws GaiaException {
         log.info("Initializing {}", PlotBeanWrapper.class);
         this.plotBean = new PlotBean();
     }
@@ -105,6 +111,26 @@ public class PlotBeanWrapper {
         return outputStream.toByteArray();
     }
 
+    public byte[] plotCalibration(PlotCategory plotCategory, int effectId, int functionId, short iteration, int width, boolean cached, short export, boolean isUpdate) throws Exception {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024*1024);
+
+        plotBean.setIsCalUpdate(isUpdate);
+        plotBean.setIdEffect(effectId);
+        plotBean.setIdFunction(functionId);
+        plotBean.setWithtitle(true);
+        plotBean.setCat(plotCategory.getCode());
+        plotBean.setIter(iteration);
+        plotBean.setSet((short)plotCategory.ordinal());
+        plotBean.setCached(cached);
+        plotBean.setWidth(width);
+        plotBean.setExport(export);
+
+        plotBean.plot(outputStream, iteration, (short) plotCategory.ordinal());
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
     public byte[] plotMap(PlotCategory plotCategory, short iteration, int width, boolean cached, short export, double min, double max) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024*1024);
 
@@ -149,6 +175,10 @@ public class PlotBeanWrapper {
         return Arrays.asList(plotBean.getGlobalGroupNames());
     }
 
+    public NrEffectsUsed getUsedEffectsTotal() throws ClassNotFoundException, RemoteException, GaiaException {
+        return new NrEffectsUsed(plotBean.getUsedEffectsTotal(FprsDirection.AC), plotBean.getUsedEffectsTotal(FprsDirection.AL));
+    }
+
     public byte[] plotMultiGlobals(short globalGroupIndex, short set, short iteration, int width) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024*1024);
 
@@ -167,5 +197,28 @@ public class PlotBeanWrapper {
         plotBean.imagesToZip(outputStream);
         outputStream.flush();
         return outputStream.toByteArray();
+    }
+
+    public List<CalibrationEffectInfo> getCalibrationEffects(FprsDirection fprsDirection) throws GaiaException {
+        AstroCalDataServer calServer = plotBean.getAstroCalServer();
+        return Arrays.stream(calServer.getAstroCalibration(fprsDirection).getCalibrationEffects())
+                .map(CalibrationEffectInfo::new)
+                .collect(Collectors.toList());
+    }
+
+    public void getAstroCalServer() throws GaiaException {
+        plotBean.getAstroCalServer();
+    }
+    
+    public PlotSummaryInfo getPlotSummaryInfo() throws Exception {
+        int nrSummaryAstro = plotBean.getNoSummaryPlots();
+        int nrSummaryAtt = plotBean.getNoAttSummaryPlots();
+        int nrSummaryCal = plotBean.getNoCalSummaryPlots();
+        int nrSummaryRot = plotBean.getNoRotSummaryPlots();
+        int nrSummaryCg = plotBean.getNoCGSummaryPlots();
+        int nrSummaryCorr = plotBean.getNoCorrSummaryPlots();
+        int nrSummaryAux = plotBean.getNoAuxSummaryPlots();
+        int nrSummaryRes = plotBean.getNoResSummaryPlots();
+        return new PlotSummaryInfo(nrSummaryAstro, nrSummaryAtt, nrSummaryCal, nrSummaryRot, nrSummaryCg, nrSummaryCorr, nrSummaryAux, nrSummaryRes);
     }
 }

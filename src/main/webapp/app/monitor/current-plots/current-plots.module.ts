@@ -6,17 +6,19 @@ import { CurrentPlotsComponent } from './current-plots.component';
 
 import { currentPlotsRoute } from './current-plots.route';
 import { SourcePlotsTopLevelComponent } from './source-plots-top-level.component';
-import { CalibrationPlotsComponent } from './calibration-plots.component';
+import { CalibrationPlotsTopLevelComponent } from './calibration-plots-top-level.component';
 import { SourcePlotsBottomLevelComponent } from './source-plots-bottom-level.component';
 import { AttitudePlotsComponent } from './attitude-plots.component';
 import { GlobalPlotsComponent } from './global-plots.component';
+import { CalibrationPlotsBottomLevelComponent } from './calibration-plots-bottom-level.component';
 
 @NgModule({
   imports: [ConvergenceMonitorFrontEndSharedModule, RouterModule.forChild([currentPlotsRoute])],
   declarations: [
     CurrentPlotsComponent,
     SourcePlotsTopLevelComponent,
-    CalibrationPlotsComponent,
+    CalibrationPlotsTopLevelComponent,
+    CalibrationPlotsBottomLevelComponent,
     SourcePlotsBottomLevelComponent,
     AttitudePlotsComponent,
     GlobalPlotsComponent,

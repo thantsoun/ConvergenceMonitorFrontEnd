@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CurrentPlotsUtil, PlotsTreeNode } from './current-plots-util.model';
+import { CurrentPlotsUtil, PlotsTreeNode, PlotSummaryInfo } from './current-plots-util.model';
 import { SERVER_API_URL } from '../../app.constants';
 import { showError } from '../../shared/util/funtions.util';
 import { generateNextLevelPlotsUtil, handleHttpRequestError } from './function-utils';
@@ -21,6 +21,8 @@ export class CurrentPlotsComponent implements OnInit {
   activeTab = '';
   defaultIterSpread = 5;
   summaryShown = false;
+  convergenceShown = true;
+  plotSummaryInfo!: PlotSummaryInfo;
 
   constructor(private httpClient: HttpClient) {}
 
@@ -28,7 +30,15 @@ export class CurrentPlotsComponent implements OnInit {
     this.httpClient
       .get<CurrentPlotsUtil>(SERVER_API_URL + 'api/currentPlotsUtil')
       .toPromise()
-      .then(this.handleSuccess)
+      .then(this.handleSuccessPlotsUtil)
+      .catch(handleHttpRequestError);
+
+    this.httpClient
+      .get<PlotSummaryInfo>(SERVER_API_URL + 'api/plotSummaryInfo')
+      .toPromise()
+      .then(response => {
+        this.plotSummaryInfo = response;
+      })
       .catch(handleHttpRequestError);
   }
 
@@ -52,7 +62,7 @@ export class CurrentPlotsComponent implements OnInit {
     }
   }
 
-  private handleSuccess = (response: CurrentPlotsUtil) => {
+  private handleSuccessPlotsUtil = (response: CurrentPlotsUtil) => {
     [this.currentPlotsUtil, this.nextPlotsUtil, this.activeTab] = generateNextLevelPlotsUtil(response);
     this.startIter = this.currentPlotsUtil.currentIter;
     if (this.endIter < this.startIter - this.defaultIterSpread + 1) {

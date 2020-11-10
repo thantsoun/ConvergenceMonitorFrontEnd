@@ -13,12 +13,15 @@
                     <tbody>
                     <tr *ngFor="let plotCat of utils.plotCategory.children">
                         <th scope="row" class="text-center align-middle">
-                            <span>{{plotCat.description}}</span>
-                            <span *ngIf="hasPlotMap(plotCat) || hasBinnedHistogram(plotCat)">
-                                <label>
-                                    <br>Extras<input type="checkbox" [(ngModel)]="extrasCheck[plotCat.rawEnum]">
+                            <span>{{plotCat.description}}<br></span>
+                            <div *ngIf="hasPlotMap(plotCat) || hasBinnedHistogram(plotCat)">
+                                <label *ngIf="!extrasCheck[plotCat.rawEnum]" class="fake-href" (click)="extrasCheck[plotCat.rawEnum] = !extrasCheck[plotCat.rawEnum]">
+                                    Show Extra
                                 </label>
-                            </span>
+                                <label *ngIf="extrasCheck[plotCat.rawEnum]" class="fake-href" (click)="extrasCheck[plotCat.rawEnum] = !extrasCheck[plotCat.rawEnum]">
+                                    Hide Extra
+                                </label>
+                            </div>
                         </th>
                         <td *ngFor="let iterationHeader of iterationHeaders">
                             <div *ngIf="hasPlotReady(plotCat.rawEnum, iterationHeader.nr)">

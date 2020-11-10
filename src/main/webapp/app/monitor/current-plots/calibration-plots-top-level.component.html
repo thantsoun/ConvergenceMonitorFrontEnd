@@ -1,0 +1,10 @@
+<ul ngbNav #calibrationPlotsTopLevel="ngbNav" [(activeId)]="activeTab" class="nav-tabs">
+    <li *ngFor="let tab of tabs; let i = index" [ngbNavItem]=tab>
+        <a ngbNavLink>{{tab}}</a>
+        <ng-template ngbNavContent >
+            <jhi-calibration-plots-bottom-level [plotsUtil]="tabsPlotUtils[i]" [isUpdate]="tabsIsUpdate[i]" [startIteration]="startIter" [endIteration]="endIter"></jhi-calibration-plots-bottom-level>
+        </ng-template>
+    </li>
+</ul>
+<div [ngbNavOutlet]="calibrationPlotsTopLevel" class="mx-0"></div>
+

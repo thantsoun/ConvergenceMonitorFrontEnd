@@ -19,8 +19,8 @@
  */
 package gaia.cu3.agis.convergence.web.rest;
 
-import gaia.cu3.agis.convergence.domain.BinHistogramInfo;
-import gaia.cu3.agis.convergence.domain.CurrentPlotsUtil;
+import gaia.cu1.tools.satellite.definitions.FprsDirection;
+import gaia.cu3.agis.convergence.domain.*;
 import gaia.cu3.agis.convergence.service.IterationBeanWrapper;
 import gaia.cu3.agis.convergence.service.PlotBeanWrapper;
 import gaia.cu3.agis.convergence.web.rest.util.DetailedHeaderUtil;
@@ -67,9 +67,9 @@ public class PlotResource {
     }
 
     @GetMapping("/currentPlotsUtil")
-    public ResponseEntity<CurrentPlotsUtil> getCurrentPlotsUtil() {
+    public synchronized ResponseEntity<CurrentPlotsUtil> getCurrentPlotsUtil() {
         try {
-            plotBeanWrapper.setRun(AgisUtils.getCurrRunId());
+            setUpPlotBean();
             int currentIter = plotBeanWrapper.getIterationCount();
             plotBeanWrapper.setRetrievalMode(false);
             PlotCategory[] plotCategories = plotBeanWrapper.getConvergencePlotCategories();
@@ -88,11 +88,26 @@ public class PlotResource {
         }
     }
 
+    @GetMapping("/plotSummaryInfo")
+    public synchronized ResponseEntity<PlotSummaryInfo> getPlotSummaryInfo() {
+        try {
+            setUpPlotBean();
+            return ResponseEntity.ok(plotBeanWrapper.getPlotSummaryInfo());
+        } catch (Exception ex) {
+            log.error("Error getting the Current Plots Util Object", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the Current Plots Util Object", ex.getMessage()))
+                    .build();
+        }
+    }
+
     @GetMapping("/binHistogramInfo")
-    public ResponseEntity<List<BinHistogramInfo>> getBinHistogramInfo(
+    public synchronized ResponseEntity<List<BinHistogramInfo>> getBinHistogramInfo(
             @RequestParam(value = "plotCategory") String plotCategoryString,
             @RequestParam(value = "iteration") short iteration) {
         try {
+            setUpPlotBean();
             PlotCategory plotCategory = PlotCategory.valueOf(plotCategoryString);
             int parentOrdinal = plotCategory.getParent().ordinal();
             boolean isUpdate = !plotCategory.getCode().endsWith(".true");
@@ -108,8 +123,57 @@ public class PlotResource {
         }
     }
 
+    @GetMapping("/getGlobalGroupNames")
+    public synchronized ResponseEntity<List<String>> getGlobalGroupNames() {
+        try {
+            setUpPlotBean();
+            return ResponseEntity.ok()
+                    .body(plotBeanWrapper.getGlobalGroupNames());
+        } catch (Exception ex) {
+            log.error("Error getting the global group names", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the global group names", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/nrEffectsUsed")
+    public synchronized ResponseEntity<NrEffectsUsed> getNrEffectsUsed() {
+        try {
+            setUpPlotBean();
+            plotBeanWrapper.getAstroCalServer();
+            return ResponseEntity.ok()
+                    .body(plotBeanWrapper.getUsedEffectsTotal());
+        } catch (Exception ex) {
+            log.error("Error getting the total number of effects", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the total number of effects", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/calibrationPlotsInfo")
+    public synchronized ResponseEntity<List<CalibrationEffectInfo>> getCalibrationPlotsInfo(@RequestParam(value = "plotCategory") String plotCategoryString) {
+        try {
+            setUpPlotBean();
+            plotBeanWrapper.getAstroCalServer();
+            PlotCategory plotCategory = PlotCategory.valueOf(plotCategoryString);
+            FprsDirection scan = plotCategory.equals(PlotCategory.GEN_CALIBRATION_AC) ? FprsDirection.AC : FprsDirection.AL;
+            return ResponseEntity.ok()
+                    .body(plotBeanWrapper.getCalibrationEffects(scan));
+        } catch (Exception ex) {
+            log.error("Error getting the calibration effects information", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the calibration effects information", ex.getMessage()))
+                    .build();
+        }
+    }
+
     @GetMapping("/plot")
-    public ResponseEntity<InputStreamResource> plot(
+    public synchronized ResponseEntity<InputStreamResource> plot(
             @RequestParam(value = "plotCategory") String plotCategoryString,
             @RequestParam(value = "iteration") short iteration,
             @RequestParam(value = "width") int width,
@@ -117,6 +181,7 @@ public class PlotResource {
             @RequestParam(value = "export") short export
     ) {
         try {
+            setUpPlotBean();
             PlotCategory plotCategory = PlotCategory.valueOf(plotCategoryString);
             byte[] imgBytes = plotBeanWrapper.plot(plotCategory, iteration, width, cached, export);
             InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(imgBytes));
@@ -133,8 +198,38 @@ public class PlotResource {
         }
     }
 
+    @GetMapping("/plotCalibration")
+    public synchronized ResponseEntity<InputStreamResource> plotCalibration(
+            @RequestParam(value = "plotCategory") String plotCategoryString,
+            @RequestParam(value = "iteration") short iteration,
+            @RequestParam(value = "effectId") int effectId,
+            @RequestParam(value = "functionId") int functionId,
+            @RequestParam(value = "isUpdate") boolean isUpdate,
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached,
+            @RequestParam(value = "export") short export
+    ) {
+        try {
+            setUpPlotBean();
+            plotBeanWrapper.getAstroCalServer();
+            PlotCategory plotCategory = PlotCategory.valueOf(plotCategoryString);
+            byte[] imgBytes = plotBeanWrapper.plotCalibration(plotCategory, effectId, functionId, iteration, width, cached, export, isUpdate);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(imgBytes));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the calibration plot", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the calibration plot", ex.getMessage()))
+                    .build();
+        }
+    }
+
     @GetMapping("/plotMap")
-    public ResponseEntity<InputStreamResource> plotMap(
+    public synchronized ResponseEntity<InputStreamResource> plotMap(
             @RequestParam(value = "plotCategory") String plotCategoryString,
             @RequestParam(value = "iteration") short iteration,
             @RequestParam(value = "width") int width,
@@ -144,6 +239,7 @@ public class PlotResource {
             @RequestParam(value = "max", defaultValue = "0", required = false) short max
             ) {
         try {
+            setUpPlotBean();
             PlotCategory plotCategory = PlotCategory.valueOf(plotCategoryString);
             byte[] imgBytes = plotBeanWrapper.plotMap(plotCategory, iteration, width, cached, export, min, max);
             InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(imgBytes));
@@ -161,7 +257,7 @@ public class PlotResource {
     }
 
     @GetMapping("/magBinnedHistogram")
-    public ResponseEntity<InputStreamResource> magBinnedHistogram(
+    public synchronized ResponseEntity<InputStreamResource> magBinnedHistogram(
             @RequestParam(value = "plotCategory") String plotCategoryString,
             @RequestParam(value = "iteration") short iteration,
             @RequestParam(value = "width") int width,
@@ -169,6 +265,7 @@ public class PlotResource {
             @RequestParam(value = "cached") boolean cached
     ) {
         try {
+            setUpPlotBean();
             PlotCategory plotCategory = PlotCategory.valueOf(plotCategoryString);
             boolean isUpdate = !plotCategory.getCode().endsWith(".true");
             byte[] imgBytes = plotBeanWrapper.magBinnedHistogram(plotCategory.getParent(), iteration, width, cached, bin, isUpdate);
@@ -186,28 +283,15 @@ public class PlotResource {
         }
     }
 
-    @GetMapping("/getGlobalGroupNames")
-    public ResponseEntity<List<String>> getGlobalGroupNames() {
-        try {
-            return ResponseEntity.ok()
-                    .body(plotBeanWrapper.getGlobalGroupNames());
-        } catch (Exception ex) {
-            log.error("Error getting the global group names", ex);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the global group names", ex.getMessage()))
-                    .build();
-        }
-    }
-
     @GetMapping("/plotMultiGlobals")
-    public ResponseEntity<InputStreamResource> plotMultiGlobals(
+    public synchronized ResponseEntity<InputStreamResource> plotMultiGlobals(
             @RequestParam(value = "globalGroupIndex") short globalGroupIndex,
             @RequestParam(value = "set") short set,
             @RequestParam(value = "iteration") short iteration,
             @RequestParam(value = "width") int width
     ) {
         try {
+            setUpPlotBean();
             byte[] imgBytes = plotBeanWrapper.plotMultiGlobals(globalGroupIndex, set, iteration, width);
             InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(imgBytes));
             return ResponseEntity.ok()
@@ -224,8 +308,9 @@ public class PlotResource {
     }
 
     @GetMapping("/getImagesZipped")
-    public ResponseEntity<byte[]> getImagesZipped() {
+    public synchronized ResponseEntity<byte[]> getImagesZipped() {
         try {
+            setUpPlotBean();
             byte[] imgBytes = plotBeanWrapper.imagesToZip();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentLength(imgBytes.length);
@@ -240,5 +325,10 @@ public class PlotResource {
                     .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the multi globals", ex.getMessage()))
                     .build();
         }
+    }
+    
+    private void setUpPlotBean() throws Exception {
+        plotBeanWrapper.setRun(AgisUtils.getCurrRunId());
+        plotBeanWrapper.setRetrievalMode(false);
     }
 }

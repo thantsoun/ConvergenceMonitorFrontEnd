@@ -23,6 +23,27 @@ export class BinHistogramInfo {
   constructor(public info: string, public isEmpty: boolean, public isUpdate: boolean) {}
 }
 
+export class NrEffectsUsed {
+  constructor(public ac: number, public al: number) {}
+}
+
+export class CalibrationEffectInfo {
+  constructor(public name: string, public id: number, public description: string, public functions: CalibrationEffectInfo[]) {}
+}
+
+export class PlotSummaryInfo {
+  constructor(
+    public nrSummaryAstro: number,
+    public nrSummaryAtt: number,
+    public nrSummaryCal: number,
+    public nrSummaryRot: number,
+    public nrSummaryCg: number,
+    public nrSummaryCorr: number,
+    public nrSummaryAux: number,
+    public nrSummaryRes: number
+  ) {}
+}
+
 export interface IterationToBinHistInfo {
   [iteration: number]: BinHistogramInfo[];
 }
