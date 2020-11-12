@@ -23,6 +23,7 @@ package gaia.cu3.agis.convergence.service;
 import gaia.cu1.tools.exception.GaiaException;
 import gaia.cu1.tools.satellite.calibration.astro.AstroCalDataServer;
 import gaia.cu1.tools.satellite.definitions.FprsDirection;
+import gaia.cu1.tools.util.props.PropertyLoader;
 import gaia.cu3.agis.algo.gis.convergence.source.MagnitudeBinHistoImpl;
 import gaia.cu3.agis.convergence.domain.BinHistogramInfo;
 import gaia.cu3.agis.convergence.domain.CalibrationEffectInfo;
@@ -55,7 +56,7 @@ public class PlotBeanWrapper {
     
     private final PlotBean plotBean;
 
-    public PlotBeanWrapper() throws GaiaException {
+    public PlotBeanWrapper() {
         log.info("Initializing {}", PlotBeanWrapper.class);
         this.plotBean = new PlotBean();
     }
@@ -214,11 +215,158 @@ public class PlotBeanWrapper {
         int nrSummaryAstro = plotBean.getNoSummaryPlots();
         int nrSummaryAtt = plotBean.getNoAttSummaryPlots();
         int nrSummaryCal = plotBean.getNoCalSummaryPlots();
-        int nrSummaryRot = plotBean.getNoRotSummaryPlots();
+        int nrSummaryRot = PropertyLoader.getPropertyAsBoolean("gaia.cu3.agis.mgr.rotateEveryRun") ? plotBean.getNoRotSummaryPlots() : 0;
         int nrSummaryCg = plotBean.getNoCGSummaryPlots();
         int nrSummaryCorr = plotBean.getNoCorrSummaryPlots();
         int nrSummaryAux = plotBean.getNoAuxSummaryPlots();
         int nrSummaryRes = plotBean.getNoResSummaryPlots();
         return new PlotSummaryInfo(nrSummaryAstro, nrSummaryAtt, nrSummaryCal, nrSummaryRot, nrSummaryCg, nrSummaryCorr, nrSummaryAux, nrSummaryRes);
+    }
+
+    public byte[] plotAllInOneConvSummaryPng(int width, boolean cached) throws Exception {
+        plotBean.setExport(0);
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        return plotAllInOneConvSummary();
+    }
+
+    public byte[] getAllInOneConvSummaryCsv() throws Exception {
+        plotBean.setExport(1);
+        plotBean.setCached(false);
+        return plotAllInOneConvSummary();
+    }
+
+    private byte[] plotAllInOneConvSummary() throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.plotAllInOneConvSummary(outputStream);
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    public byte[] plotSummaryPng(int summary, int width, boolean cached) throws Exception {
+        plotBean.setExport(0);
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        return plotSummary(summary);
+    }
+
+    public byte[] getSummaryCsv(int summary) throws Exception {
+        plotBean.setExport(1);
+        plotBean.setCached(false);
+        return plotSummary(summary);
+    }
+
+    private byte[] plotSummary(int summary) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.plotSummary(outputStream, summary);
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    public byte[] plotRotSummaryPng(int rot, int width, boolean cached) throws Exception {
+        plotBean.setExport(0);
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        return plotRotSummary(rot);
+    }
+
+    public byte[] getRotSummaryCsv(int rot) throws Exception {
+        plotBean.setExport(1);
+        plotBean.setCached(false);
+        return plotRotSummary(rot);
+    }
+
+    private byte[] plotRotSummary(int rot) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.plotFrameRotationSummary(outputStream, rot);
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    public byte[] plotCGSummaryPng(int cg, int width, boolean cached) throws Exception {
+        plotBean.setExport(0);
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        return plotCGSummary(cg);
+    }
+
+    public byte[] getCGSummaryCsv(int cg) throws Exception {
+        plotBean.setExport(1);
+        plotBean.setCached(false);
+        return plotCGSummary(cg);
+    }
+
+    private byte[] plotCGSummary(int cg) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.plotCGSummary(outputStream, cg);
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    public byte[] plotCorrSummaryPng(int corr, int width, boolean cached) throws Exception {
+        plotBean.setExport(0);
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        return plotCorrSummary(corr);
+    }
+
+    public byte[] getCorrSummaryCsv(int corr) throws Exception {
+        plotBean.setExport(1);
+        plotBean.setCached(false);
+        return plotCorrSummary(corr);
+    }
+
+    private byte[] plotCorrSummary(int corr) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.plotCorrelationSummary(outputStream, corr);
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    public byte[] plotAuxSummaryPng(int aux, int width, boolean cached) throws Exception {
+        plotBean.setExport(0);
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        return plotAuxSummary(aux);
+    }
+
+    public byte[] getAuxSummaryCsv(int aux) throws Exception {
+        plotBean.setExport(1);
+        plotBean.setCached(false);
+        return plotAuxSummary(aux);
+    }
+
+    private byte[] plotAuxSummary(int aux) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.plotAuxSummary(outputStream, aux);
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    public byte[] plotResSummaryPng(int width, boolean cached) throws Exception {
+        plotBean.setExport(0);
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        return plotResSummary();
+    }
+
+    public byte[] getResSummaryCsv() throws Exception {
+        plotBean.setExport(1);
+        plotBean.setCached(false);
+        return plotResSummary();
+    }
+
+    private byte[] plotResSummary() throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.plotResSummary(outputStream);
+        outputStream.flush();
+        return outputStream.toByteArray();
     }
 }

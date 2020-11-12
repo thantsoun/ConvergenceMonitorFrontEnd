@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CurrentPlotsUtil, PlotsTreeNode, PlotSummaryInfo } from './current-plots-util.model';
+import { CurrentPlotsUtil, PlotsTreeNode } from './current-plots-util.model';
 import { SERVER_API_URL } from '../../app.constants';
 import { showError } from '../../shared/util/funtions.util';
-import { generateNextLevelPlotsUtil, handleHttpRequestError } from './function-utils';
-import { saveAs } from 'file-saver';
+import { downLoadFile, generateNextLevelPlotsUtil, handleHttpRequestError } from './function-utils';
 
 @Component({
   selector: 'jhi-current-plots',
@@ -19,10 +18,9 @@ export class CurrentPlotsComponent implements OnInit {
   startIterForm = 1;
   endIterForm = 0;
   activeTab = '';
-  defaultIterSpread = 5;
+  defaultIterSpread = 1;
   summaryShown = false;
   convergenceShown = true;
-  plotSummaryInfo!: PlotSummaryInfo;
 
   constructor(private httpClient: HttpClient) {}
 
@@ -31,14 +29,6 @@ export class CurrentPlotsComponent implements OnInit {
       .get<CurrentPlotsUtil>(SERVER_API_URL + 'api/currentPlotsUtil')
       .toPromise()
       .then(this.handleSuccessPlotsUtil)
-      .catch(handleHttpRequestError);
-
-    this.httpClient
-      .get<PlotSummaryInfo>(SERVER_API_URL + 'api/plotSummaryInfo')
-      .toPromise()
-      .then(response => {
-        this.plotSummaryInfo = response;
-      })
       .catch(handleHttpRequestError);
   }
 
@@ -80,19 +70,8 @@ export class CurrentPlotsComponent implements OnInit {
       })
       .toPromise()
       .then(response => {
-        this.downLoadFile(response);
+        downLoadFile(response);
       })
       .catch(handleHttpRequestError);
-  }
-
-  downLoadFile(response: any): void {
-    const filenameIndex = 'filename=';
-    const contentDisposition = response.headers.get('Content-Disposition');
-    const filename = contentDisposition.substring(contentDisposition.indexOf(filenameIndex) + filenameIndex.length);
-    const contentType = response.headers.get('content-type');
-    const attachment = new Blob([response.body], {
-      type: contentType,
-    });
-    saveAs(attachment, filename);
   }
 }

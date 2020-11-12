@@ -11,6 +11,7 @@ import { SourcePlotsBottomLevelComponent } from './source-plots-bottom-level.com
 import { AttitudePlotsComponent } from './attitude-plots.component';
 import { GlobalPlotsComponent } from './global-plots.component';
 import { CalibrationPlotsBottomLevelComponent } from './calibration-plots-bottom-level.component';
+import { SummaryPlotsComponent } from './summary-plots.component';
 
 @NgModule({
   imports: [ConvergenceMonitorFrontEndSharedModule, RouterModule.forChild([currentPlotsRoute])],
@@ -22,6 +23,7 @@ import { CalibrationPlotsBottomLevelComponent } from './calibration-plots-bottom
     SourcePlotsBottomLevelComponent,
     AttitudePlotsComponent,
     GlobalPlotsComponent,
+    SummaryPlotsComponent,
   ],
 })
 export class CurrentPlotsModule {}

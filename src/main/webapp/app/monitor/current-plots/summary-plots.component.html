@@ -1,0 +1,99 @@
+<table class="table table-responsive d-table table-sm smallish-font" aria-describedby="Summary Plots">
+    <tr *ngIf="plotSummaryInfo.nrSummaryAstro > 0">
+        <th class="align-middle" scope="row">Astrometric parameters</th>
+        <td>
+            <div *ngIf="hasSummaryAllPlotReady()" class="text-center">
+                <img [src]="summaryPlotAll"
+                     [width]="plotWidth" alt="Plot for astrometric summary for all"
+                     style="cursor: pointer"
+                     (click)="loadSummaryAllPlotBig()">
+            </div>
+            <div>
+                <span class="fake-href" (click)="exportSummaryAll()">Export to CSV</span>
+            </div>
+        </td>
+        <td *ngFor="let i of counter(plotSummaryInfo.nrSummaryAstro)">
+            <div *ngIf="hasSummaryPlotReady(i)" class="text-center">
+                <img [src]="summaryPlot.get(i)"
+                     [width]="plotWidth" alt="Plot for astrometric summary for {{i}}"
+                     style="cursor: pointer"
+                     (click)="loadSummaryPlotBig(i)">
+            </div>
+            <div>
+                <span class="fake-href" (click)="exportSummary(i)">Export to CSV</span>
+            </div>
+        </td>
+    </tr>
+    <!-- TODO: add calibration-->
+    <!-- TODO: add attitude-->
+    <tr *ngIf="plotSummaryInfo.nrSummaryRot > 0">
+        <th class="align-middle" scope="row">Reference frame rotation parameters</th>
+        <td *ngFor="let i of counter(plotSummaryInfo.nrSummaryRot)">
+            <div *ngIf="hasRefPlotReady(i)" class="text-center">
+                <img [src]="refPlot.get(i)"
+                     [width]="plotWidth" alt="Plot for reference frame {{i}}"
+                     style="cursor: pointer"
+                     (click)="loadRefPlotBig(i)">
+            </div>
+            <div>
+                <span class="fake-href" (click)="exportRef(i)">Export to CSV</span>
+            </div>
+        </td>
+    </tr>
+    <tr *ngIf="plotSummaryInfo.nrSummaryCg > 0">
+        <th class="align-middle" scope="row">Solution method scalars</th>
+        <td *ngFor="let i of counter(plotSummaryInfo.nrSummaryCg)">
+            <div *ngIf="hasCGPlotReady(i)" class="text-center">
+                <img [src]="cgPlot.get(i)"
+                     [width]="plotWidth" alt="Plot for CG {{i}}"
+                     style="cursor: pointer"
+                     (click)="loadCGPlotBig(i)">
+            </div>
+            <div>
+                <span class="fake-href" (click)="exportCG(i)">Export to CSV</span>
+            </div>
+        </td>
+    </tr>
+    <tr *ngIf="plotSummaryInfo.nrSummaryAux > 0">
+        <th class="align-middle" scope="row">Auxiliary Parameters</th>
+        <td *ngFor="let i of counter(plotSummaryInfo.nrSummaryAux)">
+            <div *ngIf="hasAuxPlotReady(i)" class="text-center">
+                <img [src]="auxPlot.get(i)"
+                     [width]="plotWidth" alt="Plot for Auxiliary {{i}}"
+                     style="cursor: pointer"
+                     (click)="loadAuxPlotBig(i)">
+            </div>
+            <div>
+                <span class="fake-href" (click)="exportAux(i)">Export to CSV</span>
+            </div>
+        </td>
+    </tr>
+    <tr *ngIf="plotSummaryInfo.nrSummaryRes > 0">
+        <th class="align-middle" scope="row">Residual Parameters</th>
+        <td>
+            <div *ngIf="hasResPlotReady()" class="text-center">
+                <img [src]="resPlot"
+                     [width]="plotWidth" alt="Plot for residual parameters"
+                     style="cursor: pointer"
+                     (click)="loadResPlotBig()">
+            </div>
+            <div>
+                <span class="fake-href" (click)="exportRes()">Export to CSV</span>
+            </div>
+        </td>
+    </tr>
+    <tr *ngIf="plotSummaryInfo.nrSummaryCorr > 0">
+        <th class="align-middle" scope="row">Correlation Parameters</th>
+        <td *ngFor="let i of counter(plotSummaryInfo.nrSummaryCorr)">
+            <div *ngIf="hasCorrPlotReady(i)" class="text-center">
+                <img [src]="corrPlot.get(i)"
+                     [width]="plotWidth" alt="Plot for Correlation {{i}}"
+                     style="cursor: pointer"
+                     (click)="loadCorrPlotBig(i)">
+            </div>
+            <div>
+                <span class="fake-href" (click)="exportCorr(i)">Export to CSV</span>
+            </div>
+        </td>
+    </tr>
+</table>

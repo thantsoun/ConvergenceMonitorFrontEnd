@@ -14,6 +14,7 @@
     <span style="cursor: pointer" *ngIf="!summaryShown" (click)="summaryShown = !summaryShown">[Show]</span>
     <span style="cursor: pointer" *ngIf="summaryShown" (click)="summaryShown = !summaryShown">[Hide]</span>
 </h6>
+<jhi-summary-plots *ngIf="summaryShown"></jhi-summary-plots>
 <h6>Convergence histograms
     <span style="cursor: pointer" *ngIf="!convergenceShown" (click)="convergenceShown = !convergenceShown">[Show]</span>
     <span style="cursor: pointer" *ngIf="convergenceShown" (click)="convergenceShown = !convergenceShown">[Hide]</span>

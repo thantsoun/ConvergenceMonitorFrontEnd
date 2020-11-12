@@ -10,6 +10,7 @@ import { showError } from '../../shared/util/funtions.util';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { createRequestOption } from '../../shared/util/request-util';
 import { SERVER_API_URL } from '../../app.constants';
+import { saveAs } from 'file-saver';
 
 export function generateNextLevelPlotsUtilWithFilter(
   currentLevelPlotsUtil: CurrentPlotsUtil,
@@ -229,4 +230,15 @@ export function getMagBinnedHistogram(
     .toPromise()
     .then(response => successFunction(response.body))
     .catch(handleHttpRequestError);
+}
+
+export function downLoadFile(response: any): void {
+  const filenameIndex = 'filename=';
+  const contentDisposition = response.headers.get('Content-Disposition');
+  const filename = contentDisposition.substring(contentDisposition.indexOf(filenameIndex) + filenameIndex.length);
+  const contentType = response.headers.get('content-type');
+  const attachment = new Blob([response.body], {
+    type: contentType,
+  });
+  saveAs(attachment, filename);
 }

@@ -326,6 +326,317 @@ public class PlotResource {
                     .build();
         }
     }
+
+    @GetMapping("/getAllSummaryCsv")
+    public synchronized ResponseEntity<byte[]> getAllSummaryCsv(
+            @RequestParam(value = "filename") String filename
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.getAllInOneConvSummaryCsv();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(content.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "text/plain");
+            return ResponseEntity.ok().headers(headers).body(content);
+        } catch (Exception ex) {
+            log.error("Error getting all astrometric summary csv file for all", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting all astrometric summary csv file for all", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotAllSummaryPng")
+    public synchronized ResponseEntity<InputStreamResource> plotAllSummaryPng(
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotAllInOneConvSummaryPng(width, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting all astrometric summary png file for all", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting all astrometric summary png file for all", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/getSummaryCsv")
+    public synchronized ResponseEntity<byte[]> getSummaryCsv(
+            @RequestParam(value = "summary") int summary,
+            @RequestParam(value = "filename") String filename
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.getSummaryCsv(summary);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(content.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "text/plain");
+            return ResponseEntity.ok().headers(headers).body(content);
+        } catch (Exception ex) {
+            log.error("Error getting all astrometric summary csv file for {}", summary, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting all astrometric summary csv file for " + summary, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotSummaryPng")
+    public synchronized ResponseEntity<InputStreamResource> plotSummaryPng(
+            @RequestParam(value = "summary") int summary,
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotSummaryPng(summary, width, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting all astrometric summary png file for {}", summary, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting all astrometric summary png file for " + summary, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/getRotSummaryCsv")
+    public synchronized ResponseEntity<byte[]> getRotSummaryCsv(
+            @RequestParam(value = "rot") int rot,
+            @RequestParam(value = "filename") String filename
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.getRotSummaryCsv(rot);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(content.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "text/plain");
+            return ResponseEntity.ok().headers(headers).body(content);
+        } catch (Exception ex) {
+            log.error("Error getting the frame rotation summary csv file for {}", rot, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the frame rotation csv file for " + rot, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotRotSummaryPng")
+    public synchronized ResponseEntity<InputStreamResource> plotRotSummaryPng(
+            @RequestParam(value = "rot") int rot,
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotRotSummaryPng(rot, width, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the frame rotation summary png file for {}", rot, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the frame rotation summary png file for " + rot, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/getCGSummaryCsv")
+    public synchronized ResponseEntity<byte[]> getCGSummaryCsv(
+            @RequestParam(value = "cg") int cg,
+            @RequestParam(value = "filename") String filename
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.getCGSummaryCsv(cg);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(content.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "text/plain");
+            return ResponseEntity.ok().headers(headers).body(content);
+        } catch (Exception ex) {
+            log.error("Error getting the CG summary csv file for {}", cg, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the CG summary csv file for " + cg, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotCGSummaryPng")
+    public synchronized ResponseEntity<InputStreamResource> plotCGSummaryPng(
+            @RequestParam(value = "cg") int cg,
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotCGSummaryPng(cg, width, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the CG summary png file for {}", cg, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the CG summary png file for " + cg, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/getCorrSummaryCsv")
+    public synchronized ResponseEntity<byte[]> getCorrSummaryCsv(
+            @RequestParam(value = "corr") int corr,
+            @RequestParam(value = "filename") String filename
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.getCorrSummaryCsv(corr);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(content.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "text/plain");
+            return ResponseEntity.ok().headers(headers).body(content);
+        } catch (Exception ex) {
+            log.error("Error getting the Correlation summary csv file for {}", corr, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the Correlation summary csv file for " + corr, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotCorrSummaryPng")
+    public synchronized ResponseEntity<InputStreamResource> plotCorrSummaryPng(
+            @RequestParam(value = "corr") int corr,
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotCorrSummaryPng(corr, width, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the Correlation summary png file for {}", corr, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the corr summary png file for " + corr, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/getAuxSummaryCsv")
+    public synchronized ResponseEntity<byte[]> getAuxSummaryCsv(
+            @RequestParam(value = "aux") int aux,
+            @RequestParam(value = "filename") String filename
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.getAuxSummaryCsv(aux);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(content.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "text/plain");
+            return ResponseEntity.ok().headers(headers).body(content);
+        } catch (Exception ex) {
+            log.error("Error getting the Auxiliary summary csv file for {}", aux, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the Auxiliary summary csv file for " + aux, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotAuxSummaryPng")
+    public synchronized ResponseEntity<InputStreamResource> plotAuxSummaryPng(
+            @RequestParam(value = "aux") int aux,
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotAuxSummaryPng(aux, width, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the Auxiliary summary png file for {}", aux, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the auxiliary summary png file for " + aux, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/getResSummaryCsv")
+    public synchronized ResponseEntity<byte[]> getResSummaryCsv(
+            @RequestParam(value = "filename") String filename
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.getResSummaryCsv();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(content.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "text/plain");
+            return ResponseEntity.ok().headers(headers).body(content);
+        } catch (Exception ex) {
+            log.error("Error getting the residuals summary csv file", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the residuals summary csv file", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotResSummaryPng")
+    public synchronized ResponseEntity<InputStreamResource> plotResSummaryPng(
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotResSummaryPng(width, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the Residuals summary png file", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the Residuals summary png file", ex.getMessage()))
+                    .build();
+        }
+    }
     
     private void setUpPlotBean() throws Exception {
         plotBeanWrapper.setRun(AgisUtils.getCurrRunId());
