@@ -26,7 +26,6 @@ import gaia.cu3.agis.convergence.service.PlotBeanWrapper;
 import gaia.cu3.agis.convergence.web.rest.util.DetailedHeaderUtil;
 import gaia.cu3.agis.plotting.PlotCategory;
 import gaia.cu3.agis.util.AgisUtils;
-import gaia.cu3.agis.util.RunIterIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,14 +69,7 @@ public class PlotResource {
     public synchronized ResponseEntity<CurrentPlotsUtil> getCurrentPlotsUtil() {
         try {
             setUpPlotBean();
-            int currentIter = plotBeanWrapper.getIterationCount();
-            plotBeanWrapper.setRetrievalMode(false);
-            PlotCategory[] plotCategories = plotBeanWrapper.getConvergencePlotCategories();
-            int nrParamSolved = plotBeanWrapper.getNparamSolved();
-            long iterId = iterationBeanWrapper.getIterId();
-            String iterIdDecoded = RunIterIdentifier.decodeIterId(iterId);
-            String runIdDecoded = RunIterIdentifier.decodeRunId(iterationBeanWrapper.getRunId());
-            CurrentPlotsUtil currentPlotsUtil = new CurrentPlotsUtil(plotCategories, nrParamSolved, currentIter, runIdDecoded, iterIdDecoded, iterId);
+            CurrentPlotsUtil currentPlotsUtil = plotBeanWrapper.getCurrentPlotsUtil(plotBeanWrapper.getConvergencePlotCategories());
             return ResponseEntity.ok(currentPlotsUtil);
         } catch (Exception ex) {
             log.error("Error getting the Current Plots Util Object", ex);
@@ -634,6 +626,122 @@ public class PlotResource {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the Residuals summary png file", ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/getCalSummaryCsv")
+    public synchronized ResponseEntity<byte[]> getCalSummaryCsv(
+            @RequestParam(value = "cal") int cal,
+            @RequestParam(value = "filename") String filename
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.getCalSummaryCsv(cal);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(content.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "text/plain");
+            return ResponseEntity.ok().headers(headers).body(content);
+        } catch (Exception ex) {
+            log.error("Error getting the Calibration summary csv file for {}", cal, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the Calibration summary csv file for " + cal, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotCalSummaryPng")
+    public synchronized ResponseEntity<InputStreamResource> plotCalSummaryPng(
+            @RequestParam(value = "cal") int cal,
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotCalSummaryPng(cal, width, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the calibration summary png file for {}", cal, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the calibration summary png file for " + cal, ex.getMessage()))
+                    .build();
+        }
+    }
+
+
+    @GetMapping("/getAttSummaryCsv")
+    public synchronized ResponseEntity<byte[]> getAttSummaryCsv(
+            @RequestParam(value = "att") int att,
+            @RequestParam(value = "filename") String filename
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.getAttSummaryCsv(att);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(content.length);
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.set(HttpHeaders.CONTENT_TYPE, "text/plain");
+            return ResponseEntity.ok().headers(headers).body(content);
+        } catch (Exception ex) {
+            log.error("Error getting the attitude summary csv file for {}", att, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the attitude summary csv file for " + att, ex.getMessage()))
+                    .build();
+        }
+    }
+
+    @GetMapping("/plotAttSummaryPng")
+    public synchronized ResponseEntity<InputStreamResource> plotAttSummaryPng(
+            @RequestParam(value = "att") int att,
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotAttSummaryPng(att, width, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the attitude summary png file for {}", att, ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the attitude summary png file for " + att, ex.getMessage()))
+                    .build();
+        }
+    }
+    
+    @GetMapping("/plotSrcDist")
+    public synchronized ResponseEntity<InputStreamResource> plotSrcDist(
+            @RequestParam(value = "width") int width,
+            @RequestParam(value = "srcDist") short srcDist,
+            @RequestParam(value = "iteration") short iteration,
+            @RequestParam(value = "isUpdate") boolean isUpdate,
+            @RequestParam(value = "cached") boolean cached
+    ) {
+        try {
+            setUpPlotBean();
+            byte[] content = plotBeanWrapper.plotSourceDistribution(srcDist, iteration, width, isUpdate, cached);
+            InputStreamResource inputStreamResource = new InputStreamResource(new ByteArrayInputStream(content));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png")
+                    .header("Cache-Control", "no-cache")
+                    .body(inputStreamResource);
+        } catch (Exception ex) {
+            log.error("Error getting the source distribution plot", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .headers(DetailedHeaderUtil.createDetailedError(applicationName, "Error getting the source distribution plot", ex.getMessage()))
                     .build();
         }
     }

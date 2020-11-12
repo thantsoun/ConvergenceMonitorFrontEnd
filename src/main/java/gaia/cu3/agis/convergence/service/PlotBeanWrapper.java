@@ -25,11 +25,10 @@ import gaia.cu1.tools.satellite.calibration.astro.AstroCalDataServer;
 import gaia.cu1.tools.satellite.definitions.FprsDirection;
 import gaia.cu1.tools.util.props.PropertyLoader;
 import gaia.cu3.agis.algo.gis.convergence.source.MagnitudeBinHistoImpl;
-import gaia.cu3.agis.convergence.domain.BinHistogramInfo;
-import gaia.cu3.agis.convergence.domain.CalibrationEffectInfo;
-import gaia.cu3.agis.convergence.domain.NrEffectsUsed;
-import gaia.cu3.agis.convergence.domain.PlotSummaryInfo;
+import gaia.cu3.agis.algo.gis.convergence.source.SourceDistributionHisto;
+import gaia.cu3.agis.convergence.domain.*;
 import gaia.cu3.agis.plotting.PlotCategory;
+import gaia.cu3.agis.util.RunIterIdentifier;
 import gaia.cu3.agis.web.PlotBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +54,11 @@ public class PlotBeanWrapper {
     private final Logger log = LoggerFactory.getLogger(PlotBeanWrapper.class);
     
     private final PlotBean plotBean;
+    private final IterationBeanWrapper iterationBeanWrapper;
 
-    public PlotBeanWrapper() {
+    public PlotBeanWrapper(IterationBeanWrapper iterationBeanWrapper) {
         log.info("Initializing {}", PlotBeanWrapper.class);
+        this.iterationBeanWrapper = iterationBeanWrapper;
         this.plotBean = new PlotBean();
     }
 
@@ -220,7 +221,10 @@ public class PlotBeanWrapper {
         int nrSummaryCorr = plotBean.getNoCorrSummaryPlots();
         int nrSummaryAux = plotBean.getNoAuxSummaryPlots();
         int nrSummaryRes = plotBean.getNoResSummaryPlots();
-        return new PlotSummaryInfo(nrSummaryAstro, nrSummaryAtt, nrSummaryCal, nrSummaryRot, nrSummaryCg, nrSummaryCorr, nrSummaryAux, nrSummaryRes);
+        int nrSrcDist = SourceDistributionHisto.SOURCE_DISTRIBUTION_PLOT_COMPONENT.values().length;
+        PlotCategory[] plotCategories = PlotCategory.SOURCE_NUM.getSubCategories();
+        return new PlotSummaryInfo(nrSummaryAstro, nrSummaryAtt, nrSummaryCal, nrSummaryRot, nrSummaryCg, nrSummaryCorr, nrSummaryAux, nrSummaryRes, nrSrcDist,
+                getCurrentPlotsUtil(plotCategories));
     }
 
     public byte[] plotAllInOneConvSummaryPng(int width, boolean cached) throws Exception {
@@ -368,5 +372,77 @@ public class PlotBeanWrapper {
         plotBean.plotResSummary(outputStream);
         outputStream.flush();
         return outputStream.toByteArray();
+    }
+
+    public byte[] plotCalSummaryPng(int cal, int width, boolean cached) throws Exception {
+        plotBean.setExport(0);
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        return plotCalSummary(cal);
+    }
+
+    public byte[] getCalSummaryCsv(int cal) throws Exception {
+        plotBean.setExport(1);
+        plotBean.setCached(false);
+        return plotCalSummary(cal);
+    }
+
+    public byte[] plotAttSummaryPng(int att, int width, boolean cached) throws Exception {
+        plotBean.setExport(0);
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setCached(cached);
+        return plotAttSummary(att);
+    }
+
+    public byte[] getAttSummaryCsv(int att) throws Exception {
+        plotBean.setExport(1);
+        plotBean.setCached(false);
+        return plotAttSummary(att);
+    }
+
+    private byte[] plotAttSummary(int att) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.plotAttSummary(outputStream, att);
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    private byte[] plotCalSummary(int cal) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(4096*4096);
+        plotBean.plotCalSummary(outputStream, cal);
+        outputStream.flush();
+        return outputStream.toByteArray();
+    }
+
+    public byte[] plotSourceDistribution(short srcDist, short iteration, int width, boolean isUpdate, boolean cached) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024*1024);
+
+        plotBean.setWithtitle(true);
+        plotBean.setWidth(width);
+        plotBean.setExport(0);
+        plotBean.setCached(cached);
+
+
+        try {
+            plotBean.plotSourceDistribution(outputStream, srcDist, isUpdate, iteration);
+        } catch (Exception e) {
+            log.error("Error getting the Source Distribution Summary Plot: {}", e.getMessage());
+            plotBean.streamErrorImage(outputStream, e.getMessage());
+        }
+
+        outputStream.flush();
+        return outputStream.toByteArray();
+
+    }
+
+    public CurrentPlotsUtil getCurrentPlotsUtil(PlotCategory[] plotCategories) throws Exception {
+        int currentIter = getIterationCount();
+        int nrParamSolved = getNparamSolved();
+        long iterId = iterationBeanWrapper.getIterId();
+        String iterIdDecoded = RunIterIdentifier.decodeIterId(iterId);
+        String runIdDecoded = RunIterIdentifier.decodeRunId(iterationBeanWrapper.getRunId());
+        return new CurrentPlotsUtil(plotCategories, nrParamSolved, currentIter, runIdDecoded, iterIdDecoded, iterId);
     }
 }

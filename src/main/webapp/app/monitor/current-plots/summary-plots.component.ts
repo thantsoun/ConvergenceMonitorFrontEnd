@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { PlotSummaryInfo } from './current-plots-util.model';
+import { CurrentPlotsUtil, PlotsTreeNode, PlotSummaryInfo } from './current-plots-util.model';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { SERVER_API_URL } from '../../app.constants';
-import { downLoadFile, getHandleImageInNewTabSuccess, handleHttpRequestError } from './function-utils';
+import { downLoadFile, getHandleImageInNewTabSuccess, getPlotMap, handleHttpRequestError } from './function-utils';
 import { createRequestOption } from '../../shared/util/request-util';
 
 @Component({
@@ -10,14 +10,28 @@ import { createRequestOption } from '../../shared/util/request-util';
   templateUrl: './summary-plots.component.html',
 })
 export class SummaryPlotsComponent implements OnInit {
-  plotSummaryInfo: PlotSummaryInfo = new PlotSummaryInfo(0, 0, 0, 0, 0, 0, 0, 0);
+  plotSummaryInfo: PlotSummaryInfo = new PlotSummaryInfo(
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    new CurrentPlotsUtil(0, 0, '', '', 0, new PlotsTreeNode('', '', '', [], []))
+  );
   plotWidth = 400;
   plotWidthExtra = 1200;
   summaryPlotAll: any = null;
   summaryPlot!: Map<number, any>;
   refPlot!: Map<number, any>;
   cgPlot!: Map<number, any>;
+  calPlot!: Map<number, any>;
+  attPlot!: Map<number, any>;
   corrPlot!: Map<number, any>;
+  srcDistPlot!: Map<number, any>;
   auxPlot!: Map<number, any>;
   resPlot: any = null;
 
@@ -44,7 +58,10 @@ export class SummaryPlotsComponent implements OnInit {
     this.summaryPlot = new Map();
     this.refPlot = new Map();
     this.cgPlot = new Map();
+    this.calPlot = new Map();
+    this.attPlot = new Map();
     this.corrPlot = new Map();
+    this.srcDistPlot = new Map();
     this.auxPlot = new Map();
     this.getSummaryPlotAll(
       this.plotWidth,
@@ -75,6 +92,22 @@ export class SummaryPlotsComponent implements OnInit {
         this.getHandlePlotSuccess(img => this.cgPlot.set(i, img))
       );
     }
+    for (let i = 0; i < this.plotSummaryInfo.nrSummaryCal; i++) {
+      this.getCalPlot(
+        i,
+        this.plotWidth,
+        true,
+        this.getHandlePlotSuccess(img => this.calPlot.set(i, img))
+      );
+    }
+    for (let i = 0; i < this.plotSummaryInfo.nrSummaryAtt; i++) {
+      this.getAttPlot(
+        i,
+        this.plotWidth,
+        true,
+        this.getHandlePlotSuccess(img => this.attPlot.set(i, img))
+      );
+    }
     for (let i = 0; i < this.plotSummaryInfo.nrSummaryCorr; i++) {
       this.getCorrPlot(
         i,
@@ -98,6 +131,14 @@ export class SummaryPlotsComponent implements OnInit {
         this.getHandlePlotSuccess(img => (this.resPlot = img))
       );
     }
+    for (let i = 0; i < this.plotSummaryInfo.nrSrcDist; i++) {
+      this.getSrcDistPlot(
+        i,
+        this.plotWidth,
+        true,
+        this.getHandlePlotSuccess(img => this.srcDistPlot.set(i, img))
+      );
+    }
   }
 
   counter(size: number): number[] {
@@ -116,12 +157,24 @@ export class SummaryPlotsComponent implements OnInit {
     return this.cgPlot.has(cg);
   }
 
+  hasAttPlotReady(att: number): boolean {
+    return this.attPlot.has(att);
+  }
+
+  hasCalPlotReady(cal: number): boolean {
+    return this.calPlot.has(cal);
+  }
+
   hasAuxPlotReady(aux: number): boolean {
     return this.auxPlot.has(aux);
   }
 
   hasCorrPlotReady(corr: number): boolean {
     return this.corrPlot.has(corr);
+  }
+
+  hasSrcDistPlotReady(srcDist: number): boolean {
+    return this.srcDistPlot.has(srcDist);
   }
 
   hasSummaryAllPlotReady(): boolean {
@@ -147,6 +200,11 @@ export class SummaryPlotsComponent implements OnInit {
     this.getCorrPlot(corr, this.plotWidthExtra, false, getHandleImageInNewTabSuccess(title));
   }
 
+  loadSrcDistPlotBig(srcDist: number): void {
+    const title = 'Source distribution ' + srcDist;
+    this.getSrcDistPlot(srcDist, this.plotWidthExtra, false, getHandleImageInNewTabSuccess(title));
+  }
+
   loadAuxPlotBig(aux: number): void {
     const title = 'Auxiliary summary ' + aux;
     this.getAuxPlot(aux, this.plotWidthExtra, false, getHandleImageInNewTabSuccess(title));
@@ -160,6 +218,16 @@ export class SummaryPlotsComponent implements OnInit {
   loadCGPlotBig(cg: number): void {
     const title = 'Solution Method Scalars ' + cg;
     this.getCGPlot(cg, this.plotWidthExtra, false, getHandleImageInNewTabSuccess(title));
+  }
+
+  loadCalPlotBig(cal: number): void {
+    const title = 'Calibration parameter ' + cal;
+    this.getCalPlot(cal, this.plotWidthExtra, false, getHandleImageInNewTabSuccess(title));
+  }
+
+  loadAttPlotBig(att: number): void {
+    const title = 'Attitude Parameter ' + att;
+    this.getAttPlot(att, this.plotWidthExtra, false, getHandleImageInNewTabSuccess(title));
   }
 
   loadSummaryAllPlotBig(): void {
@@ -196,6 +264,22 @@ export class SummaryPlotsComponent implements OnInit {
       cg: cgNumber,
     };
     this.exportCsv(request, 'api/getCGSummaryCsv');
+  }
+
+  exportCal(calNumber: number): void {
+    const request = {
+      filename: 'calibration_parameters_' + calNumber + '.csv',
+      cal: calNumber,
+    };
+    this.exportCsv(request, 'api/getCalSummaryCsv');
+  }
+
+  exportAtt(attNumber: number): void {
+    const request = {
+      filename: 'attitude_parameters_' + attNumber + '.csv',
+      att: attNumber,
+    };
+    this.exportCsv(request, 'api/getAttSummaryCsv');
   }
 
   exportRes(): void {
@@ -256,6 +340,24 @@ export class SummaryPlotsComponent implements OnInit {
     this.getPlot(request, 'api/plotCGSummaryPng', successFunction);
   }
 
+  private getCalPlot(calNumber: number, plotWidth: number, isCached: boolean, successFunction: (response: any) => void): void {
+    const request = {
+      cal: calNumber,
+      width: plotWidth,
+      cached: isCached,
+    };
+    this.getPlot(request, 'api/plotCalSummaryPng', successFunction);
+  }
+
+  private getAttPlot(attNumber: number, plotWidth: number, isCached: boolean, successFunction: (response: any) => void): void {
+    const request = {
+      att: attNumber,
+      width: plotWidth,
+      cached: isCached,
+    };
+    this.getPlot(request, 'api/plotAttSummaryPng', successFunction);
+  }
+
   private getAuxPlot(auxNumber: number, plotWidth: number, isCached: boolean, successFunction: (response: any) => void): void {
     const request = {
       aux: auxNumber,
@@ -272,6 +374,17 @@ export class SummaryPlotsComponent implements OnInit {
       cached: isCached,
     };
     this.getPlot(request, 'api/plotCorrSummaryPng', successFunction);
+  }
+
+  private getSrcDistPlot(srcDistNumber: number, plotWidth: number, isCached: boolean, successFunction: (response: any) => void): void {
+    const request = {
+      srcDist: srcDistNumber,
+      width: plotWidth,
+      cached: isCached,
+      isUpdate: true,
+      iteration: this.plotSummaryInfo.currentPlotsUtil.currentIter - 1,
+    };
+    this.getPlot(request, 'api/plotSrcDist', successFunction);
   }
 
   private getResPlot(plotWidth: number, isCached: boolean, successFunction: (response: any) => void): void {
@@ -324,5 +437,17 @@ export class SummaryPlotsComponent implements OnInit {
         reader.readAsDataURL(imageBlob);
       }
     };
+  }
+
+  loadSourceMap(plotCat: PlotsTreeNode): void {
+    const title = plotCat.description + ' plot';
+    getPlotMap(
+      this.httpClient,
+      plotCat,
+      this.plotSummaryInfo.currentPlotsUtil.currentIter - 1,
+      this.plotWidthExtra,
+      false,
+      getHandleImageInNewTabSuccess(title)
+    );
   }
 }

@@ -40,7 +40,9 @@ export class PlotSummaryInfo {
     public nrSummaryCg: number,
     public nrSummaryCorr: number,
     public nrSummaryAux: number,
-    public nrSummaryRes: number
+    public nrSummaryRes: number,
+    public nrSrcDist: number,
+    public currentPlotsUtil: CurrentPlotsUtil
   ) {}
 }
 

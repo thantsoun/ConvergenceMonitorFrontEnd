@@ -18,7 +18,7 @@ export class CurrentPlotsComponent implements OnInit {
   startIterForm = 1;
   endIterForm = 0;
   activeTab = '';
-  defaultIterSpread = 1;
+  defaultIterSpread = 3;
   summaryShown = false;
   convergenceShown = true;
 

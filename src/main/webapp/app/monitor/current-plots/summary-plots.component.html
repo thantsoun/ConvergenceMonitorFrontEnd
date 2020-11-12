@@ -24,8 +24,34 @@
             </div>
         </td>
     </tr>
-    <!-- TODO: add calibration-->
-    <!-- TODO: add attitude-->
+    <tr *ngIf="plotSummaryInfo.nrSummaryAtt > 0">
+        <th class="align-middle" scope="row">Attitude parameters</th>
+        <td *ngFor="let i of counter(plotSummaryInfo.nrSummaryAtt)">
+            <div *ngIf="hasAttPlotReady(i)" class="text-center">
+                <img [src]="attPlot.get(i)"
+                     [width]="plotWidth" alt="Plot for Attitude parameter {{i}}"
+                     style="cursor: pointer"
+                     (click)="loadAttPlotBig(i)">
+            </div>
+            <div>
+                <span class="fake-href" (click)="exportAtt(i)">Export to CSV</span>
+            </div>
+        </td>
+    </tr>
+    <tr *ngIf="plotSummaryInfo.nrSummaryCal > 0">
+        <th class="align-middle" scope="row">Calibration parameters</th>
+        <td *ngFor="let i of counter(plotSummaryInfo.nrSummaryCal)">
+            <div *ngIf="hasCalPlotReady(i)" class="text-center">
+                <img [src]="calPlot.get(i)"
+                     [width]="plotWidth" alt="Plot for Calibration parameters {{i}}"
+                     style="cursor: pointer"
+                     (click)="loadCalPlotBig(i)">
+            </div>
+            <div>
+                <span class="fake-href" (click)="exportCal(i)">Export to CSV</span>
+            </div>
+        </td>
+    </tr>
     <tr *ngIf="plotSummaryInfo.nrSummaryRot > 0">
         <th class="align-middle" scope="row">Reference frame rotation parameters</th>
         <td *ngFor="let i of counter(plotSummaryInfo.nrSummaryRot)">
@@ -93,6 +119,25 @@
             </div>
             <div>
                 <span class="fake-href" (click)="exportCorr(i)">Export to CSV</span>
+            </div>
+        </td>
+    </tr>
+    <tr *ngIf="plotSummaryInfo.nrSrcDist > 0">
+        <th class="align-middle" scope="row">Source Parameter Distribution (at iter {{(plotSummaryInfo.currentPlotsUtil.currentIter - 1)}})</th>
+        <td *ngFor="let i of counter(plotSummaryInfo.nrSrcDist)">
+            <div *ngIf="hasSrcDistPlotReady(i)" class="text-center">
+                <img [src]="srcDistPlot.get(i)"
+                     [width]="plotWidth" alt="Source distribution plot for {{i}}"
+                     style="cursor: pointer"
+                     (click)="loadSrcDistPlotBig(i)">
+            </div>
+        </td>
+    </tr>
+    <tr *ngIf="plotSummaryInfo.currentPlotsUtil.plotCategory.children.length > 0">
+        <th class="align-middle" scope="row">Source maps (at iter {{(plotSummaryInfo.currentPlotsUtil.currentIter - 1)}})</th>
+        <td *ngFor="let plotCat of plotSummaryInfo.currentPlotsUtil.plotCategory.children">
+            <div>
+                <span class="fake-href" (click)="loadSourceMap(plotCat)">Open {{plotCat.description}} map</span>
             </div>
         </td>
     </tr>

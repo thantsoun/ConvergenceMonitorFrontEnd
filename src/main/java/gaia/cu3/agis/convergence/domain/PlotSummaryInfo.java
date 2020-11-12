@@ -16,8 +16,11 @@ public class PlotSummaryInfo {
     public final int nrSummaryCorr;
     public final int nrSummaryAux;
     public final int nrSummaryRes;
+    public final int nrSrcDist;
+    public final CurrentPlotsUtil currentPlotsUtil;
     
-    public PlotSummaryInfo(int nrSummaryAstro, int nrSummaryAtt, int nrSummaryCal, int nrSummaryRot, int nrSummaryCg, int nrSummaryCorr, int nrSummaryAux, int nrSummaryRes) {
+    public PlotSummaryInfo(int nrSummaryAstro, int nrSummaryAtt, int nrSummaryCal, int nrSummaryRot, int nrSummaryCg, int nrSummaryCorr, int nrSummaryAux, 
+                           int nrSummaryRes, int nrSrcDist, CurrentPlotsUtil currentPlotsUtil) {
         this.nrSummaryAstro = nrSummaryAstro;
         this.nrSummaryAtt = nrSummaryAtt;
         this.nrSummaryCal = nrSummaryCal;
@@ -26,5 +29,7 @@ public class PlotSummaryInfo {
         this.nrSummaryCorr = nrSummaryCorr;
         this.nrSummaryAux = nrSummaryAux;
         this.nrSummaryRes = nrSummaryRes;
+        this.nrSrcDist = nrSrcDist;
+        this.currentPlotsUtil = currentPlotsUtil;
     }
 }
